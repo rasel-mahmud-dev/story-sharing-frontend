@@ -20,7 +20,7 @@ import {faAdn} from "@fortawesome/free-brands-svg-icons";
 import withWidth from "../UI/withWidth/WithWidth";
 import PreLoad from "../UI/Preload/Preload";
 
-const Logo = (_)=> <svg xmlns="http://www.w3.org/2000/svg"  width="153" height="27.851" viewBox="0 0 153 27.851">
+const Logo = (_)=> <svg xmlns="http://www.w3.org/2000/svg"  width="155" height="27.851" viewBox="0 0 153 27.851">
   <defs>
     <radialGradient id="radial-gradient" cx="0.698" cy="0.478" r="3.151" gradientTransform="matrix(1, 0.003, -0.001, 0.192, 0, 0.385)" gradientUnits="objectBoundingBox">
       <stop offset="0" stop-color="#3d2ffb"/>
@@ -145,14 +145,6 @@ const Navigation = (props) => {
     let val = postState.searchValue.trim().toLowerCase()
     if(val) {
       navigate(`/search?text=${val}`)
-      // let uniqArr = filterPost(postState.posts, val)
-      // if (uniqArr.length > 0) {
-      //   dispatch({type: "SEARCH_POSTS", payload: uniqArr})
-      //   history.replace(`/search?text=${val}`)
-      // } else {
-      //   dispatch({type: "SEARCH_POSTS", payload: []})
-      //   history.replace(`/?search=${val}`)
-      // }
     } else {
       dispatch({type: "SEARCH_POSTS", payload: postState.posts})
       navigate(`/`)
@@ -215,9 +207,7 @@ const Navigation = (props) => {
               <div className="flex align-center">
                 <div className="brand">
                   <Link to="/" className="flex">
-                    <Logo />
-                    {/*<img className="w-7 mr-2" src="https://res.cloudinary.com/dbuvg9h1e/image/upload/v1638967729/Asset_2_zadmyf.svg" alt=""/>*/}
-                    {/*<h4>DEV STORY</h4>*/}
+                    <img className="w-44 mr-2" src="/Vector (1).png" alt=""/>
                   </Link>
                 </div>
               </div>
@@ -244,7 +234,7 @@ const Navigation = (props) => {
             {/* Desktop Nav */}
             <div className="nav-auth flex-5 hidden md:block">
               <ul className="nav_items flex justify-end align-center text-gray-600 dark:text-gray-300">
-                <li className="nav-item"><NavLink className="nav_link" to="/about">Our Story</NavLink></li>
+                <li className="nav-item py-4"><NavLink className="nav_link" to="/about">Our Story</NavLink></li>
                 <li className="nav-item"><PreLoad className="nav_link" to="/auth/add-post/null">Write Story</PreLoad></li>
                 { authState._id
                   ? (
@@ -257,7 +247,7 @@ const Navigation = (props) => {
                         ? authState.username.slice(0, 15)
                         : authState.username}
                       </h4>
-                      <div className="mx-2">
+                      <div className="mx-2 py-4">
                         { authState.avatar
                           ? <img  onError={loadErrorAvatar} className="w-5 rounded-full flex" src={fullLink( authState.avatar)} />
                           : <FontAwesomeIcon icon={faUserCircle} className="flex text-md text-gray-600 " />
@@ -265,8 +255,12 @@ const Navigation = (props) => {
                       </div>
                       {authDropdown(expandDropdown === "user_menu")}
                     </div>
-                  ) : <li className="nav-item">
-                      <PreLoad className="nav_link" to="/auth/join">Sign In</PreLoad>
+                  ) : <li className="nav-item leading-none">
+                      <PreLoad className="nav_link" to="/auth/join">
+                        <button className="bg-primary text-white px-5 py-3 rounded-lg">
+                        Sign In
+                        </button>
+                      </PreLoad>
                 </li>
                 }
               </ul>

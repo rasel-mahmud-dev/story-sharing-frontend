@@ -16,8 +16,9 @@
     margin: auto;
   }
   .main-nav{
-    min-height: 60px;
-    line-height: 60px;
+    //min-height: 60px;
+    //line-height: 60px;
+    padding: 4px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -26,7 +27,6 @@
       .nav_link{
         padding: 0 10px;
         font-weight: 500;
-        font-family: "Inter-Regular", "Noto Sans Bengali", system-ui, Helvetica, Arial, sans-serif;
       }
       a{
         color: inherit;
