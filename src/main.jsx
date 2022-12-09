@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDom from 'react-dom'
 import store from "./store"
 import { Provider } from  "react-redux"
-import { HashRouter} from "react-router-dom";
+import {BrowserRouter} from "react-router-dom";
 
 import "./scss/index.scss"
 // import "tailwindcss/tailwind.css"
@@ -12,10 +12,10 @@ import './index.css'
 
 
 ReactDom.render(
-  <HashRouter>
+  <BrowserRouter>
     <Provider store={store}>
       <App />
     </Provider>
-  </HashRouter>,
+  </BrowserRouter>,
   document.getElementById('app')
 )
