@@ -8,16 +8,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {faTrash} from "@fortawesome/pro-regular-svg-icons";
 import {faPen} from "@fortawesome/free-solid-svg-icons";
 import PreloadLink from "../../../components/preloadLink/PreloadLink";
+import DashboardContext from "../dashboardContext";
 
 const AllPosts = () => {
 	
 	const {postState, authState} = useSelector(state=>state)
 	
+	const context = React.useContext(DashboardContext)
 	const dispatch = useDispatch()
 	
 	React.useEffect(()=>{
-		if(postState.posts && postState.posts.length <= 0 ){
-			fetchPosts(dispatch, "", (data) => {})
+		if(context.dashboardState && context.dashboardState.allPosts.length === 0 ){
+			fetchPosts(dispatch, "", (data) => {
+				if(data){
+					context.actions.fetchAllPosts(data)
+				}
+			})
 		}
 	}, [])
 	
@@ -51,12 +57,12 @@ const AllPosts = () => {
 		<div>
 			<h1 className="dark_subtitle">All Posts</h1>
 			
-			{ postState.posts.map(p=>(
+			{ context.dashboardState.allPosts && context.dashboardState.allPosts.length > 0 &&  context.dashboardState.allPosts.map(p=>(
 				<div className="my-1 px-3 bg-gray-9 dark:bg-dark-600">
 					<div className="flex justify-between bg-opacity-50 py-2">
 						<h4 className="dark_subtitle">{p.title}</h4>
 						<span className="flex align-center">
-							<PreloadLink to={`/admin/dashboard/add-post/${p.id}`}>
+							<PreloadLink to={`/admin/dashboard/add-post/${p._id}`}>
 								 <FontAwesomeIcon icon={faPen} className="pointer fa fa-trash ml-3 text-sm dark_gray "/>
 							</PreloadLink>
 							

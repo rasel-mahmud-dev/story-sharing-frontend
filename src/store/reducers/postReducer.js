@@ -93,8 +93,8 @@ export default function (state = initialState, action) {
         }
       }
       return updatedState
-    
-    
+  
+  
     case "DELETE_CACHE_USER_POST" :
       const currentCacheUserIndex = updatedState.cacheUserProfile.findIndex(profile=>profile._id ===  action.payload.author_id)
       if(currentCacheUserIndex === -1) return updatedState

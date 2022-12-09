@@ -10,6 +10,7 @@ function EditProfileFormModal(props) {
 	
 	const [loadingState, setLoadingState] = React.useState({isShown: false, message: "" })
 	const [userProfile, setUserProfile] = React.useState({
+		_id: "",
 		username: "",
 		email: "",
 		description: "",
@@ -22,6 +23,7 @@ function EditProfileFormModal(props) {
 	
 	React.useEffect(()=>{
 		setUserProfile({
+			_id: author._id,
 			username: author.username,
 			email: author.email,
 			first_name: author.first_name,

@@ -30,7 +30,7 @@ export function filterPost(posts, searchValue) {
   }
 }
 
-export function filterPostUsingTag(dispatch, tag) {
+export function filterPostUsingTag(dispatch, tag, cb) {
   api.post("/api/filter-posts", {
     filter: {
       tags: [tag]
@@ -40,14 +40,15 @@ export function filterPostUsingTag(dispatch, tag) {
       type: "SEARCH_POSTS",
       payload: doc.data
     })
-
+    cb && cb()
   })
     .catch(ex=>{
       console.log(ex)
+      cb && cb()
     })
 }
 
-export function filterPostUsingText(dispatch, text) {
+export function filterPostUsingText(dispatch, text, cb) {
   api.post("/api/filter-posts", {
     filter: {
       text: text,
@@ -57,10 +58,11 @@ export function filterPostUsingText(dispatch, text) {
       type: "SEARCH_POSTS",
       payload: doc.data
     })
-
+    cb && cb()
   })
     .catch(ex=>{
       console.log(ex)
+      cb && cb()
     })
 }
 
@@ -69,6 +71,7 @@ export function fetchTopPosts(dispatch, pathname, cb){
   return new Promise(async (resolve, reject)=>{
     try {
       let response = await getApi().get("/api/posts/hits")
+      console.log(response)
       if (response.status === 200) {
         // setTopPosts(res.data.posts)
         dispatch({
@@ -85,25 +88,26 @@ export function fetchTopPosts(dispatch, pathname, cb){
 
 export  function fetchPosts(dispatch, pathname, cb){
   api.get("/api/posts").then(response=>{
+    
     if(response.status === 200){
       dispatch({
         type: "FETCH_POSTS",
         payload: response.data.posts
       })
-      cb()
+      cb(response.data.posts)
     } else {
       dispatch({
         type: "FETCH_POSTS",
         payload: []
       })
-      cb()
+      cb(null)
     }
   }).catch(ex=>{
     dispatch({
       type: "FETCH_POSTS",
       payload: []
     })
-    cb && cb()
+    cb && cb(null)
   })
 }
 
@@ -133,7 +137,7 @@ export function fetchPostMdContent(postId, dispatch, cb){
 
 export function fetchRawMdContent(path, dispatch, cb){
   
-  api.post(`/api/raw-md-content`, { path }).then(response=>{
+  api.post(`/api/raw-md-content`, { filePath: path }).then(response=>{
     if(response.status === 200){
       dispatch({
         type: "FETCH_RAW_MD_CONTENT",

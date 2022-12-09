@@ -6,10 +6,9 @@ import path from "path"
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5500,
-    host: "0.0.0.0"
+    // host: "0.0.0.0"
   },
-  // base: "/my-blog/",
+  // base: "/dev-story/",
   build: {
     // outDir: "build"
   },

@@ -1,14 +1,15 @@
 import React, { Suspense } from 'react';
-import {Link, useHistory, useParams} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import "./homepage.scss"
 import {fetchPosts, fetchTopPosts, filterPost} from "../../store/actions/postAction";
 import {useDispatch, useSelector} from "react-redux";
 import queryString from "query-string"
-import PreloadLink from "../../components/preloadLink/PreloadLink";
+
 import ReactLazyPreload from "../../utils/ReactLazyPreload";
 import RenderPostsSkeleton from "../../components/RenderPosts/RenderPostsSkeleton";
 import TopHitsPostsSkeleton from "../../components/TopHitsPosts/TopHitsPostsSkeleton";
 import TopHitsPosts from "../../components/TopHitsPosts/TopHitsPosts";
+import PreLoad from "../../components/UI/Preload/Preload";
 
 const RenderPosts  =  ReactLazyPreload(()=>import("../../components/RenderPosts/RenderPosts"));
 
@@ -18,7 +19,9 @@ const HeroSection = (props) => {
   const { topPosts, posts, searchResultPosts } = useSelector(state=> state.postState )
   const dispatch = useDispatch()
   
+  
   React.useEffect(()=>{
+
     if (topPosts.posts.length === 0) {
       fetchTopPosts(dispatch).then(r => {})
     }
@@ -57,7 +60,7 @@ const HeroSection = (props) => {
                      with millions of readers.</p>
                  
                <button className="btn mt-4 btn-outline font-medium dark:text-gray-400">
-                 <PreloadLink to="/auth/add-post/null" className="dark:text-gray-400">Start Writing</PreloadLink>
+                 <PreLoad to="/auth/add-post/null" className="dark:text-gray-400">Start Writing</PreLoad>
                </button>
                
              </div>
@@ -90,7 +93,7 @@ const HeroSection = (props) => {
                 <div className="mt-4 flex flex-3 flex-wrap">
                   {topTags.map(tag=>(
                     <span className="mx-1 my-1 mt-2 ">
-                      <PreloadLink to={`/search?tag=${tag.toLowerCase()}`} className="btn bg-gray-10 rounded dark:bg-dark-500 dark:text-gray-300">{tag}</PreloadLink>
+                      <PreLoad to={`/search?tag=${tag.toLowerCase()}`} className="btn bg-gray-10 rounded dark:bg-dark-500 dark:text-gray-300">{tag}</PreLoad>
                     </span>
                   ))}
                 </div>
@@ -111,28 +114,29 @@ const Homepage = () => {
     const postState = useSelector(state=>state.postState)
   
     
-    const history = useHistory()
+    const navigate = useNavigate()
+    const location = useLocation()
     const dispatch = useDispatch()
 
     React.useEffect(()=>{
-        let qs = queryString.parse(history.location.search)
+        let qs = queryString.parse(location.search)
         let val = qs.search
         if (val) {
             let uniqArr = filterPost(postState.posts, val.trim().toLowerCase())
                 dispatch({type: "SET_POST_SEARCH_VALUE", payload: val.trim().toLowerCase()})
             if (uniqArr.length > 0) {
                 dispatch({type: "SEARCH_POSTS", payload: uniqArr})
-
-                history.replace(`/?search=${val}`)
+  
+              navigate(`/?search=${val}`)
             } else {
                 dispatch({type: "SEARCH_POSTS", payload: []})
-                history.replace(`/?search=${val}`)
+              navigate(`/?search=${val}`)
             }
         } else {
             dispatch({type: "SEARCH_POSTS", payload: postState.posts})
         }
 
-    }, [history.location.search])
+    }, [])
 
   
     return (

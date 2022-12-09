@@ -1,9 +1,9 @@
-import {Link, NavLink, useHistory} from "react-router-dom";
+import {Link, NavLink, useNavigate} from "react-router-dom";
 import "./navigation.scss"
 import fullLink from "../../utils/fullLink";
 import  React, {useEffect, useState} from "react";
 import {useDispatch} from "react-redux";
-import PreloadLink from "../preloadLink/PreloadLink";
+
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -18,6 +18,7 @@ import {
 import {faAdn} from "@fortawesome/free-brands-svg-icons";
 
 import withWidth from "../UI/withWidth/WithWidth";
+import PreLoad from "../UI/Preload/Preload";
 
 const Logo = (_)=> <svg xmlns="http://www.w3.org/2000/svg"  width="153" height="27.851" viewBox="0 0 153 27.851">
   <defs>
@@ -40,7 +41,12 @@ const Logo = (_)=> <svg xmlns="http://www.w3.org/2000/svg"  width="153" height="
           fill="#5d51ff" font-size="22"
           font-family="Roboto-Medium, Roboto"
           font-weight="900" letter-spacing="-0.015em">
-      <tspan x="0" y="0">DEV STORY</tspan></text>
+      <tspan x="0" y="0">STORY</tspan>
+      <tspan font-size="11"
+          font-family="Roboto-Medium, Roboto"
+          font-weight="900" letter-spacing="-0.015em">SHARING</tspan>
+
+      </text>
   </g>
 </svg>
 
@@ -49,13 +55,13 @@ const Navigation = (props) => {
   
   const {authState, postState, expandDropdown, handleSetExpandDropdown, innerWidth } = props
   
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const [theme, setTheme] = React.useState("light")
   
   const [openMobileSearch, setOpenMobileSearch] = React.useState(false)
   const [isMobile, setIsMobile] = React.useState(false)
-
+  
   React.useEffect(()=>{
     let html = window.document.children[0]
     let theme = window.localStorage.getItem("theme")
@@ -82,6 +88,19 @@ const Navigation = (props) => {
       payload: {}
     })
   }
+  
+  
+  function loadErrorAvatar(e){
+    const div = document.createElement("h1")
+    div.innerHTML = `
+       <div class="w-6 h-6 rounded-full bg-gray-300  dark:bg-primary shadow-md flex justify-center align-center">
+        <span class="text-sm font-medium">${authState.first_name[0]}</span>
+      </div>
+    `
+    e.target.parentNode.appendChild(div)
+    e.target.remove()
+  }
+  
 
   function authDropdown(isShow) {
     return isShow && (
@@ -92,14 +111,14 @@ const Navigation = (props) => {
               { authState.role === "admin" && (
                   <li className="flex hover:bg-primary hover:bg-opacity-40 hover:text-white cursor-pointer px-2 py-2">
                     <FontAwesomeIcon icon={faAdn} className="mr-2 dark_title text-gray-800" />
-                    <PreloadLink className="block dark_subtitle" onClick={()=>handleSetExpandDropdown("")}  to="/admin/dashboard">Dashboard</PreloadLink>
+                    <PreLoad className="block dark_subtitle" onClick={()=>handleSetExpandDropdown("")}  to="/admin/dashboard">Dashboard</PreLoad>
                   </li>
               ) }
               <li  className="flex hover:bg-opacity-40 hover:bg-primary hover:text-white cursor-pointer px-2 py-2">
-                <PreloadLink className="block dark_subtitle" to={`/author/profile/${authState.username}/${authState._id}`}>
+                <PreLoad className="block dark_subtitle" to={`/author/profile/${authState.username}/${authState._id}`}>
                   <FontAwesomeIcon icon={faUserAlt} className="mr-2 dark_title text-gray-800" />
                   Profile
-                </PreloadLink>
+                </PreLoad>
               </li>
               <li onClick={()=> logoutRoutePush("/user/profile") } className="flex hover:bg-primary hover:bg-opacity-40 hover:text-white cursor-pointer px-2 py-2">
                 <FontAwesomeIcon icon={faSignOutAlt} className="mr-2 dark_title text-gray-800" />
@@ -111,7 +130,7 @@ const Navigation = (props) => {
             className="flex flex-1 items-center hover:bg-primary hover:bg-opacity-40 hover:text-white  cursor-pointer  px-2 py-2"
             // onClick={()=> pushRoute("/auth/login") }
           >
-              <PreloadLink className="block" to="/auth/login"><FontAwesomeIcon  className="mr-2 text-gray-800" icon={faSignIn} />Login</PreloadLink>
+              <PreLoad className="block" to="/auth/login"><FontAwesomeIcon  className="mr-2 text-gray-800" icon={faSignIn} />Login</PreLoad>
               </li>
             )
           }
@@ -125,7 +144,7 @@ const Navigation = (props) => {
     setOpenMobileSearch(false)
     let val = postState.searchValue.trim().toLowerCase()
     if(val) {
-      history.replace(`/search?text=${val}`)
+      navigate(`/search?text=${val}`)
       // let uniqArr = filterPost(postState.posts, val)
       // if (uniqArr.length > 0) {
       //   dispatch({type: "SEARCH_POSTS", payload: uniqArr})
@@ -136,7 +155,7 @@ const Navigation = (props) => {
       // }
     } else {
       dispatch({type: "SEARCH_POSTS", payload: postState.posts})
-      history.replace(`/`)
+      navigate(`/`)
     }
   }
 
@@ -222,10 +241,11 @@ const Navigation = (props) => {
             </div>
             
             
+            {/* Desktop Nav */}
             <div className="nav-auth flex-5 hidden md:block">
               <ul className="nav_items flex justify-end align-center text-gray-600 dark:text-gray-300">
                 <li className="nav-item"><NavLink className="nav_link" to="/about">Our Story</NavLink></li>
-                <li className="nav-item"><PreloadLink className="nav_link" to="/auth/add-post/null">Write Story</PreloadLink></li>
+                <li className="nav-item"><PreLoad className="nav_link" to="/auth/add-post/null">Write Story</PreLoad></li>
                 { authState._id
                   ? (
                     <div className="nav-item flex align-center relative"
@@ -233,20 +253,20 @@ const Navigation = (props) => {
                          onMouseEnter={()=>handleSetExpandDropdown("user_menu")}
                          onClick={openMenuHandler}
                     >
-                      <h4 className="">{authState.first_name
-                        && authState.first_name.length > 15 ? authState.first_name.slice(0, 15)
-                        : authState.first_name}
+                      <h4 className="text-primary font-medium">{authState.username && authState.username > 15
+                        ? authState.username.slice(0, 15)
+                        : authState.username}
                       </h4>
-                      <div className="mx-4">
+                      <div className="mx-2">
                         { authState.avatar
-                          ? <img className="w-5 rounded-full flex" src={fullLink( authState.avatar)} />
+                          ? <img  onError={loadErrorAvatar} className="w-5 rounded-full flex" src={fullLink( authState.avatar)} />
                           : <FontAwesomeIcon icon={faUserCircle} className="flex text-md text-gray-600 " />
                         }
                       </div>
                       {authDropdown(expandDropdown === "user_menu")}
                     </div>
                   ) : <li className="nav-item">
-                      <PreloadLink className="nav_link" to="/auth/join">Sign In</PreloadLink>
+                      <PreLoad className="nav_link" to="/auth/join">Sign In</PreLoad>
                 </li>
                 }
               </ul>
@@ -261,7 +281,7 @@ const Navigation = (props) => {
                          ? <img
                               className="w-5 rounded-full flex"
                               src={fullLink( authState.avatar)}
-            
+                              onError={loadErrorAvatar}
                               onClick={openMenuHandler}
                          />
                          : <FontAwesomeIcon icon={faUserCircle} className="flex text-md md:text-base text-gray-600" />}

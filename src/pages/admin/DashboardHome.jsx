@@ -3,6 +3,7 @@ import React from "react";
 import {deletePost, fetchPosts} from "../../store/actions/postAction";
 import {getApi} from "../../apis";
 import {Link, NavLink} from "react-router-dom";
+import Writters from "./writters/Writters";
 
 function DashboardHome(props){
 	const postState = useSelector(state=>state.postState)
@@ -14,7 +15,6 @@ function DashboardHome(props){
 			fetchPosts(dispatch)
 		}
 	}, [])
-	
 
 	function handlePostDelete(id) {
 		dispatch(deletePost(id))
@@ -35,7 +35,7 @@ function DashboardHome(props){
 	return (
 		<div className="container px-4">
 			<h1 className="my-2 dark_title">Admin Dashboard</h1>
-			
+			<Writters _id={props.authId} />
 		</div>
 	)
 }

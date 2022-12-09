@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDom from 'react-dom'
 import store from "./store"
 import { Provider } from  "react-redux"
-import {HashRouter} from "react-router-dom";
+import { HashRouter} from "react-router-dom";
 
 import "./scss/index.scss"
 // import "tailwindcss/tailwind.css"

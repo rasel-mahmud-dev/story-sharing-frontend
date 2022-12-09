@@ -1,10 +1,11 @@
 import React from 'react';
 import fullLink from "../../utils/fullLink";
-import PreloadLink from "../preloadLink/PreloadLink";
-import {Link} from "react-router-dom";
+
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faHeart, faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {deletePost} from "../../store/actions/postAction";
+import {getApi} from "../../apis";
+import PreLoad from "../UI/Preload/Preload";
 
 const RenderAuthPosts = ({userPosts, _id, dispatch}) => {
 	
@@ -14,6 +15,24 @@ const RenderAuthPosts = ({userPosts, _id, dispatch}) => {
 		// setOwnPosts(ownPosts.filter(p=>p._id !== id))
 	}
 	
+	
+	function addTopPost(post) {
+		getApi().post("/api/admin/add-portfolio-top-post", {post_id: post._id}).then(r => {
+			console.log(r)
+			alert("/api/admin/add-portfolio-top-post ok")
+		}).catch(err => {
+			console.log(err)
+		})
+	}
+	
+	function addAllPost(post) {
+		getApi().post("/api/admin/add-portfolio-all-post", {post_id: post._id}).then(r => {
+			console.log(r)
+			alert("/api/admin/add-portfolio-all-post ok")
+		}).catch(err => {
+			console.log(err)
+		})
+	}
 	
 	return (
 		<div>
@@ -28,19 +47,29 @@ const RenderAuthPosts = ({userPosts, _id, dispatch}) => {
 							</div>
 							
 							<div className="flex w-full justify-between  flex-12">
-								<PreloadLink to={`/posts/${post.slug}/${post._id}`}>
+								<PreLoad to={`/posts/${post.slug}/${post._id}`}>
 									<h4 className="hover:text-primary dark_subtitle">{post.title}</h4>
-								</PreloadLink>
-								{ _id && (
+								</PreLoad>
+								{_id && (
 									<div className="ml-4">
-											<span className="action flex items-center">
-											<PreloadLink to={`/admin/dashboard/add-post/${post._id}`}>
-													 <FontAwesomeIcon icon={faPen} className="pointer fa fa-trash ml-3 text-sm dark_gray "/>
-											</PreloadLink>
-										 <FontAwesomeIcon icon={faTrash}
-												onClick={(e) => deletePostHandler(post._id, post.author_id, post.path)}
-												className="cursor-pointer  fa fa-trash ml-3 text-sm text-red-400 "/>
-										</span>
+											<div className="action flex items-center">
+												
+													<div className="flex text-base">
+													{/*<button onClick={() => addTopPost(post)} className="ml-2"><FontAwesomeIcon icon={faHeart}/></button>*/}
+													{/*<button onClick={() => addAllPost(post)} className="ml-2 font-bold">A</button>*/}
+												</div>
+												
+												<div className="flex">
+													<PreLoad to={`/admin/dashboard/add-post/${post._id}`}>
+														 <FontAwesomeIcon icon={faPen} className="pointer fa fa-trash ml-3 text-sm dark_gray "/>
+															</PreLoad>
+														 <FontAwesomeIcon icon={faTrash}
+															onClick={(e) => deletePostHandler(post._id, post.author_id, post.path)}
+															className="cursor-pointer  fa fa-trash ml-3 text-sm text-red-400 "/>
+													</div>
+												
+											</div>
+									
 									</div>
 								)}
 							</div>
@@ -50,7 +79,7 @@ const RenderAuthPosts = ({userPosts, _id, dispatch}) => {
 				
 				))}
 			</div>
-			
+		
 		</div>
 	);
 };

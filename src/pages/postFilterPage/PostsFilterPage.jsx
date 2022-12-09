@@ -3,9 +3,9 @@ import React, {useEffect, Suspense} from "react";
 import queryString from "query-string"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import "./styles.scss";
-import {Link, useHistory, useLocation, useParams} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {
-  deletePost,
+  deletePost, fetchPosts,
   filterPostUsingTag,
   filterPostUsingText
 } from "../../store/actions/postAction";
@@ -21,8 +21,6 @@ const RenderPosts  =  ReactLazyPreload(()=>import("../../components/RenderPosts/
 const PostsFilterPage = (props) => {
   const [isLoading, setLoading] = React.useState(false)
 
-  const location = useLocation()
-
   const {postState, authState} = props
   const [postDetail, setPostDetail] = React.useState({})
   const [commentPagination, setCommentPagination] = React.useState({
@@ -31,30 +29,33 @@ const PostsFilterPage = (props) => {
   })
 
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(()=>{
-    let val = queryString.parse(history.location.search)
+    setLoading(true)
+    
+    let val = queryString.parse(location.search)
     if(val.tag){
-      filterPostUsingTag(dispatch, val.tag)
+      filterPostUsingTag(dispatch, val.tag, ()=>setLoading(false))
       dispatch({
         type: "SET_POST_SEARCH_VALUE",
         payload: val.tag
       })
     } else if(val.text) {
-      filterPostUsingText(dispatch, val.text)
+      filterPostUsingText(dispatch, val.text,  ()=>setLoading(false))
       dispatch({
         type: "SET_POST_SEARCH_VALUE",
         payload: val.text
       })
     }
 
-    // if(postState.posts.length < 1) {
-    //   setLoading(true)
-    //   // fetchPosts(dispatch, location.pathname, () => setLoading(false))
-    // }
+    if(postState.posts.length < 1) {
+      setLoading(true)
+      fetchPosts(dispatch, location.pathname, () => setLoading(false))
+    }
 
-  }, [history.location.search])
+  }, [])
 
 
   // useEffect(async () => {
@@ -83,7 +84,7 @@ const PostsFilterPage = (props) => {
   function handleClearPostSearch(e) {
     dispatch({type: "SET_POST_SEARCH_VALUE", payload: ""})
     dispatch({type: "SEARCH_POSTS", payload: postState.posts})
-    history.replace("/")
+    navigate("/")
   }
 
   function deletePostHandler(id) {
@@ -103,26 +104,26 @@ const PostsFilterPage = (props) => {
           </div>
 
           <div className="mb-2"/>
-
+     
           <div className="flex justify-between bg-gray-100 dark:bg-dark-600 py-4 px-2 rounded">
            <div className="flex align-center dark:text-white">
              <div className="mr-2 no-wrap">Search by: </div>
-             <h2 className="rounded "> {postState.searchValue}</h2>
+             <h2 className="rounded"> {postState.searchValue}</h2>
              <FontAwesomeIcon icon={faTimesCircle} className="ml-2 cursor-pointer text-red-400" onClick={handleClearPostSearch}/>
            </div>
             {/*<div className="no-wrap flex align-center dark:text-white">*/}
             {/*  <span>Sort By:</span>*/}
             {/*  <h2>Created</h2>*/}
             {/*</div>*/}
-          </div>
-
+           </div>
+         
             <div className="mx-auto flex justify-center">
               { isLoading && <Loader/>  }
             </div>
 
 
             {
-              postState.searchPosts.length <= 0 ? (
+              postState.searchPosts.length === 0 ? (
               <h1 className="mt-10 dark_title title text-center text-xl">
                 {!isLoading && `Not posts matched with` }
                 <span className="text-red-500">{postState.searchValue}</span>

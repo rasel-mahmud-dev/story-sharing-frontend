@@ -6,7 +6,9 @@ import AddComment from "./AddComment";
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {faClock, faHeart, faPen, faReply, faTrash, faUserCircle} from "@fortawesome/free-solid-svg-icons";
-import PreloadLink from "../preloadLink/PreloadLink";
+import PreLoad from "../UI/Preload/Preload";
+import {faHeart as faHeartLI} from "@fortawesome/pro-regular-svg-icons";
+
 
 const Comments = (props) => {
   const {
@@ -17,16 +19,18 @@ const Comments = (props) => {
     onSetShowReplyCommentForm,
     showReplyCommentForm,
     onSubmitAddComment,
+    toggleCommentReaction,
+    authId,
   } = props
   
   
   const [showMoreCommentOptionId, setShowMoreCommentOptionId] = React.useState("")
   
-  function handleToggleMoreOption(id) {
-    if(id === showMoreCommentOptionId){
+  function handleToggleMoreOption(_id) {
+    if(_id === showMoreCommentOptionId){
       setShowMoreCommentOptionId("")
     } else {
-      setShowMoreCommentOptionId(id)
+      setShowMoreCommentOptionId(_id)
     }
   }
   
@@ -35,13 +39,15 @@ const Comments = (props) => {
   const renderCommentMemoized = renderComment(comment)
   
   
+  
   // // prevent re-rendering... whitelist these dep...
   // const renderCommentMemoized = useMemo(()=>{
   //   return renderComment(comment)
   // }, [comment, comment.reply, showMoreCommentOptionId, showReplyCommentForm])
   //
   
-  function renderComment({id, text, post_id, user_id, created_at, reply=false, child_comment_count, username, avatar}) {
+  
+  function renderComment({_id, text, post_id, userId, user, createdAt, reply=false, child_comment_count, likes, username, avatar}) {
     function formatDateTime(created) {
       let now = new Date()
       let sec = 1000;
@@ -65,45 +71,60 @@ const Comments = (props) => {
       return r
     }
 
-    function handleDeleteComment(id) {
+    function handleDeleteComment(_id) {
       handleToggleMoreOption("-1")
-      onDeleteComment && onDeleteComment(user_id, id)
+      onDeleteComment && onDeleteComment(user_id, _id)
     }
-
+    
+    let youLiked = likes.indexOf(authId) !== -1;
+    
     return (
       <div className="my-4 mt-6">
         <div className="flex">
           <div className="w-5 mr-2">
-            {avatar ?
-              <img className="flex w-full radius-100" src={fullLink(avatar)} alt="avatar"/>
+            {user && user.avatar ?
+              <img className="flex w-full radius-100" src={fullLink(user.avatar)} alt="avatar"/>
               :  <FontAwesomeIcon icon={faUserCircle} className="text-gray-500 text-md hover:text-primary" />
                }
           </div>
 
           <div className="comment-body flex-1">
-            <div className="comment-body-text px-2 py-1 bg-gray-9 bg-opacity-80 text-sm rounded">
-              <h1><PreloadLink to={`/author/profile/${username}/${user_id}`} className="text-blue-600 text-15" href="">{username}
-                {/*ID: {id}*/}
-              </PreloadLink
-              ></h1>
+            <div className="comment-body-text px-2 py-1 dark_subtitle dark:bg-dark-700 bg-gray-100 bg-opacity-80 text-sm rounded">
+              <PreLoad to={`/author/profile/${user.username}/${userId}`} className="text-blue-600 dark:ext-blue-800 text-sm font-medium" >{user.username}</PreLoad>
               {/*<h4 className="text-xs">render timestamp {Date.now().toString()}</h4>*/}
-              <h1 className="text-15 mt-1">{text}</h1>
+              <p className="text-sm dark:text-gray-300 whitespace-pre-wrap">{text}</p>
             </div>
             <div className="comment-action flex mt-1 text-xs text-gray-dark-9  items-center">
-              <li className="">
-                <FontAwesomeIcon icon={faHeart} className="text-sm hover:text-primary" />
+              <li className="flex items-center">
+           
+                <FontAwesomeIcon
+                  onClick={()=>toggleCommentReaction(_id)}
+                  className={['text-xs cursor-pointer hover:text-pink-700 ',
+                    youLiked ? 'text-pink-400 ' : 'text-gray-800'].join(" ")}
+                  // icon={faHeart}
+                  icon={youLiked ? faHeart :  faHeartLI}
+                />
+                <h4 className="text-xs font-medium ml-1">{likes && likes.length}</h4>
               </li>
               <li className="mx-3">
-                <FontAwesomeIcon icon={faReply} onClick={()=>onSetShowReplyCommentForm(id)} className="text-sm mr-1"/>
+                <FontAwesomeIcon
+                  icon={faReply}
+                  onClick={()=>onSetShowReplyCommentForm(_id)}
+                  className="text-xs mr-1"
+                />
               </li>
               <li>
-                <FontAwesomeIcon icon={faClock} onClick={()=>onSetShowReplyCommentForm(id)} className="text-sm mr-1"/>
-                {formatDateTime(new Date(created_at))}
+                <FontAwesomeIcon
+                  icon={faClock}
+                  onClick={()=>onSetShowReplyCommentForm(_id)}
+                  className="text-xs mr-1"/>
+                {formatDateTime(new Date(createdAt))}
               </li>
               <li className="ml-3  relative">
                 <span className="cursor-pointer hover:text-primary"
-                      onClick={() => handleToggleMoreOption(id)}>more</span>
-                {showMoreCommentOptionId === id && <div className="bg-white w-40 comment_option absolute shadow_1">
+                      onClick={() => handleToggleMoreOption(_id)}>more</span>
+                
+                {showMoreCommentOptionId === _id && authId === user_id && <div className="bg-white w-40 comment_option absolute shadow_1">
                   <ul className="">
                     <li className={"px-2 py-1 flex-1 cursor-pointer hover:bg-primary_light  hover:text-primary flex"}>
                      <span className="pointer-events-none  whitespace-nowrap">
@@ -111,7 +132,7 @@ const Comments = (props) => {
                         <span>Edit comment</span>
                      </span>
                     </li>
-                    <li onClick={()=>handleDeleteComment(id)}
+                    <li onClick={()=>handleDeleteComment(_id)}
                         className={"px-2 py-1 cursor-pointer hover:bg-primary_light hover:text-primary flex"}>
                       <span className="pointer-events-none whitespace-nowrap">
                         <FontAwesomeIcon icon={faTrash} className="text-sm mr-1"/>
@@ -121,15 +142,16 @@ const Comments = (props) => {
 
                   </ul>
                 </div>}
+                
               </li>
             </div>
   
-            { showReplyCommentForm === id && (
-              <AddComment onSubmit={onSubmitAddComment} parent_id={id} cancelBtn onCancel={()=>onSetShowReplyCommentForm("")} />
+            { showReplyCommentForm === _id && (
+              <AddComment onSubmit={onSubmitAddComment} parent_id={_id} cancelBtn onCancel={()=>onSetShowReplyCommentForm("")} />
             ) }
             
             {child_comment_count > 0 &&
-              <div onClick={() => reply && reply.length > 0 ? onHideReply(id) : onFetchNestedComment(id, post_id)} className="flex mt-3 items-center">
+              <div onClick={() => reply && reply.length > 0 ? onHideReply(_id) : onFetchNestedComment(_id, post_id)} className="flex mt-3 items-center">
               <i className="fa text-xs text-gray-light-7 fa-reply mr-1"/>
               <h4
                 className="text-gray-light-7 text-xs hover:text-primary cursor-pointer"> {  reply && reply.length > 0 ? "hide reply comments" : "show reply" } {child_comment_count}</h4>
