@@ -5,12 +5,12 @@ import axios from "axios";
 // @ts-ignore
 export const backend = import.meta.env.MODE === "development"
   ? "http://localhost:8080"
-  : "https://dev-story-api.netlify.app/.netlify/functions/api"
+  : "https://story-sharing-api.netlify.app/.netlify/functions/api"
 
 
 export const baseBackend = import.meta.env.MODE === "development"
   ? "http://localhost:8080"
-  : "https://dev-story-api.netlify.app/.netlify/functions/api"
+  : "https://story-sharing-api.netlify.app/.netlify/functions/api"
 
 
 

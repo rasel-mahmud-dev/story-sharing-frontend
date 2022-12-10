@@ -1,4 +1,5 @@
 import {lazy, Suspense} from "react"
+
 import {useRoutes} from "react-router-dom";
 import ProgressBar from "src/components/UI/ProgressBar/ProgressBar";
 import AddPostSkeleton from "./pages/admin/AddPostSkeleton";
@@ -8,6 +9,7 @@ import SignUp from "./pages/auth/SignUp";
 import AndroidPosts from "./pages/admin/androidPosts/AndroidPosts";
 import ForgetPassword from "./pages/auth/ForgetPassword";
 import AuthCallback from "pages/auth/AuthCallback";
+import SetNewPassword from "pages/auth/SetNewPassword";
 
 // this function function for lazy route load...........
 const ReactLazyPreload = (importStatement) => {
@@ -82,10 +84,6 @@ function MyRoutes(props) {
             authFetchInLoading: AddPostSkeleton
 
         },
-
-        // nested routes
-
-
         {
             path: "/auth/join",
             element: <AllSignInLite/>,
@@ -104,7 +102,13 @@ function MyRoutes(props) {
                     path: "reset-password",
                     index: true,
                     element: <ForgetPassword/>
-                }
+                },
+                {
+                    path: "new-password",
+                    index: true,
+                    element: <SetNewPassword/>
+                },
+
             ]
         }, // nested routes
 
