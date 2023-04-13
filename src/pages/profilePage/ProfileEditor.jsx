@@ -2,10 +2,9 @@ import React, {Suspense} from 'react';
 
 import "./profle_editor.scss"
 
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPen} from "@fortawesome/pro-light-svg-icons";
 import {useDispatch} from "react-redux";
 import ReactLazyPreload from "../../utils/ReactLazyPreload";
+import {BiPen} from "react-icons/all";
 
 
 const  EditProfileFormModal = ReactLazyPreload(()=>import("./EditProfileFormModal"));
@@ -57,7 +56,7 @@ const ProfileEditor = (props) => {
 	        <div className="mt-6 mb-2">
 						<div className="flex items-center">
 						<h4 className="font-medium text-gray-900 text-lg mr-4 dark_subtitle">Profile Information</h4>
-							<FontAwesomeIcon  className="cursor-pointer" onClick={handleProfileEditForm} icon={faPen} />
+							<BiPen  className="cursor-pointer" onClick={handleProfileEditForm}  />
 						</div>
 						
 						<div className=''>

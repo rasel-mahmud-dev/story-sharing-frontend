@@ -4,12 +4,9 @@ import api from "../../apis";
 
 import "./profile_page.scss"
 
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 
 import fullLink from "../../utils/fullLink";
 import {useDispatch, useSelector} from "react-redux";
-import {faFacebook, faGithub, faLinkedin, faTwitter} from "@fortawesome/free-brands-svg-icons";
-import {faGlobe, faPen, faTrash, faUserCircle} from "@fortawesome/free-solid-svg-icons";
 import blobToBase64 from "../../utils/blobToBase64";
 import ProfileSkeleton from "./ProfileSkeleton";
 import parseTextToHtml from "../../utils/parseTextToHtml";
@@ -18,6 +15,7 @@ import RenderAuthPostsLite from "../../components/RenderAuthPosts/RenderAuthPost
 const ProfileEditor = ReactLazyPreload(()=>import("./ProfileEditor"));
 const ProfilePhotoChooseModal = ReactLazyPreload(()=>import("./ProfilePhotoChooserModal"));
 import PreloadLink from "src/components/UI/Preload/Preload"
+import {BiGlobe, BiPen, BiUser, FaLinkedin} from "react-icons/all";
 
 const ProfilePage = (props) => {
 	const params = useParams()
@@ -44,25 +42,25 @@ const ProfilePage = (props) => {
 		setAuthor({})
 		setUserPosts(null)
 		
-		if(params.id) {
-			let idx = postState.cacheUserProfile.findIndex(p => p._id === params.id)
+		if(params.username) {
+			let idx = postState.cacheUserProfile.findIndex(p => p._id === params.username)
 			if (idx !== -1) {
 				setAuthor(postState.cacheUserProfile[idx])
 				setUserPosts(postState.cacheUserProfile[idx].posts ? postState.cacheUserProfile[idx].posts : [])
 			} else {
-				api.get(`/api/users/${params.id}`).then(response => {
+				api.get(`/api/users/${params.username}`).then(response => {
 					if (response.status === 200) {
 						dispatch({type: "FETCH_USER_PROFILE", payload: response.data.user})
 						setAuthor(response.data.user)
 						
 						
 						// fetch user posts
-						api.get(`/api/posts?author_id=${response.data.user._id}`)
+						api.get(`/api/posts?authorId=${response.data.user._id}`)
 							.then(response => {
 								if (response.status === 200) {
 									dispatch({
 										type: "FETCH_USER_POSTS",
-										payload: {userId: params.id, posts: response.data.posts}
+										payload: {userId: params.username, posts: response.data.posts}
 									})
 									setUserPosts(response.data.posts)
 								}
@@ -71,7 +69,7 @@ const ProfilePage = (props) => {
 				})
 			}
 		}
-	}, [params.id])
+	}, [params.username])
 	
 	
 	
@@ -123,7 +121,7 @@ const ProfilePage = (props) => {
 			payload: false
 		})
 		setPhotoChossserForm("")
-		let response = await api.get(`/api/users/${params.id}`)
+		let response = await api.get(`/api/users/${params.username}`)
 		if(response.status === 200) {
 			setAuthor(response.data.user)
 		}
@@ -134,7 +132,7 @@ const ProfilePage = (props) => {
 			payload: false
 		})
 		setPhotoChossserForm("")
-		let response = await api.get(`/api/users/${params.id}`)
+		let response = await api.get(`/api/users/${params.username}`)
 		if(response.status === 200) {
 			setAuthor(response.data.user)
 		}
@@ -189,12 +187,12 @@ const ProfilePage = (props) => {
 									) : (
 										photo.avatar.base
 											? <img className="w-full rounded-full" src={photo.avatar.base} alt=""/>
-											: <FontAwesomeIcon className="text-9xl" icon={faUserCircle}/>
+											: <BiUser className="text-9xl"/>
 									)}
-									{authState._id === author._id && <FontAwesomeIcon
+									{authState._id === author._id && <BiPen
 										onClick={() => togglePhotoChooserForm("avatar", true)}
 										className="absolute bottom-6 z-10 transform translate-x-1/2 right-1/2"
-										icon={faPen}
+
 									/>}
 									{/*<button className="z-10  right-2 top-2 btn btn-outline bg-primary">Change Avatar</button>*/}
 								</div>
@@ -210,22 +208,22 @@ const ProfilePage = (props) => {
 								<div className="social flex justify-center">
 									<li className="mr-2">
 										<a href="https://www.facebook.com/rasel.mahmud.dev" target="_blank">
-											<FontAwesomeIcon icon={faFacebook}/>
+											{/*<FontAwesomeIcon icon={faFacebook}/>*/}
 										</a>
 									</li>
 									<li className="mr-2">
 										<a href="https://github.com/rasel-mahmud-dev" target="_blank">
-											<FontAwesomeIcon icon={faGithub}/>
+											{/*<FontAwesomeIcon icon={faGithub}/>*/}
 										</a>
 									</li>
 									<li className="mr-4">
 										<a href="https://www.linkedin.com/in/rasel-mahmud-9869a2234" target="_blank">
-											<FontAwesomeIcon icon={faLinkedin}/>
+											<FaLinkedin />
 										</a>
 									</li>
 									<li className="mr-2">
 										<a href="https://rasel-portfolio.vercel.app" target="_blank">
-											<FontAwesomeIcon icon={faGlobe}/>
+											<BiGlobe />
 										</a>
 									</li>
 									

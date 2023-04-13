@@ -1,7 +1,7 @@
 import {connect, useDispatch} from "react-redux";
 import React, {useEffect, Suspense} from "react";
 import queryString from "query-string"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
 import "./styles.scss";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {
@@ -10,11 +10,10 @@ import {
   filterPostUsingText
 } from "../../store/actions/postAction";
 import Loader from "../../components/UI/Loader";
-import {faTimesCircle} from "@fortawesome/free-solid-svg-icons";
-
 
 
 import ReactLazyPreload from "../../utils/ReactLazyPreload";
+import {BiUser} from "react-icons/all";
 
 const RenderPosts  =  ReactLazyPreload(()=>import("../../components/RenderPosts/RenderPosts"));
 
@@ -93,7 +92,6 @@ const PostsFilterPage = (props) => {
     })
   }
 
-
   return (
     <div className="container-1000 min-h-viewport">
 
@@ -109,7 +107,7 @@ const PostsFilterPage = (props) => {
            <div className="flex align-center dark:text-white">
              <div className="mr-2 no-wrap">Search by: </div>
              <h2 className="rounded"> {postState.searchValue}</h2>
-             <FontAwesomeIcon icon={faTimesCircle} className="ml-2 cursor-pointer text-red-400" onClick={handleClearPostSearch}/>
+             <BiUser className="ml-2 cursor-pointer text-red-400" onClick={handleClearPostSearch}/>
            </div>
             {/*<div className="no-wrap flex align-center dark:text-white">*/}
             {/*  <span>Sort By:</span>*/}
@@ -123,7 +121,7 @@ const PostsFilterPage = (props) => {
 
 
             {
-              postState.searchPosts.length === 0 ? (
+              postState.search?.data?.length === 0 ? (
               <h1 className="mt-10 dark_title title text-center text-xl">
                 {!isLoading && `Not posts matched with` }
                 <span className="text-red-500">{postState.searchValue}</span>
@@ -131,7 +129,7 @@ const PostsFilterPage = (props) => {
               ) : (
                 <div className="mt-4">
                   <Suspense fallback={<h1>Loading..</h1>}>
-                    <RenderPosts posts={postState.searchPosts} />
+                    <RenderPosts posts={postState?.search?.data || [] } />
                   </Suspense>
                 </div>
               )

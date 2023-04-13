@@ -1,0 +1,18 @@
+.rich-texteditor {
+
+    .quill{
+        border: 1px solid rgba(175, 175, 175, 0.38);
+        border-radius: 6px;
+        .ql-toolbar{
+            background: #6f72d81c;
+        }
+        .ql-toolbar, .ql-container{
+            border: none;
+        }
+    }
+    .ql-editor {
+        min-height: 200px;
+        height: inherit;
+        @apply dark:text-gray-300 text-gray-700
+    }
+}

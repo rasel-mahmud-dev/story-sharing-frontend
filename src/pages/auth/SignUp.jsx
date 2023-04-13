@@ -10,11 +10,10 @@ import ProgressBar from "react-topbar-progress-indicator";
 const ForgetPassword = ReactLazyPreload(()=>import("src/pages/auth/ForgetPassword"));
 const SetNewPassword = ReactLazyPreload(()=>import("src/pages/auth/SetNewPassword"));
 
-import {FontAwesomeIcon} from  "@fortawesome/react-fontawesome"
-import {faEye} from "@fortawesome/pro-light-svg-icons";
 import api from "../../apis";
 import TakeUserInputStep from "./TakeUserInputStep";
 import validateEmail from "../../utils/validateEmail";
+import {BsEye} from "react-icons/all";
 
 
 const SignUp = (props) => {
@@ -424,7 +423,7 @@ const SignUp = (props) => {
 									<input onChange={handleChange} name="password"  value={userData.password}
 												 type="password" className="w-full text-center dark_subtitle" />
 									<span className="icon flex dark_subtitle" onClick={toggleShowPassword}>
-										<FontAwesomeIcon onClick={toggleShowPassword}  className="pointer-events-none" icon={faEye} />
+										<BsEye onClick={toggleShowPassword}  className="pointer-events-none" />
 									</span>
 								</div>
 							</div>
@@ -440,7 +439,7 @@ const SignUp = (props) => {
 										className="w-full text-center dark_subtitle"
 									/>
 									<span className="icon flex dark_subtitle" onClick={toggleShowPassword}>
-										<FontAwesomeIcon className="pointer-events-none" icon={faEye} />
+										<BsEye className="pointer-events-none"  />
 									</span>
 								</div>
 							</div>

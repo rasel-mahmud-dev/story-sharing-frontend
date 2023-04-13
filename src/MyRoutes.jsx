@@ -6,12 +6,12 @@ import AddPostSkeleton from "./pages/admin/AddPostSkeleton";
 import AllSignIn from "./pages/auth/AllSignIn";
 import LoginWithEmail from "./pages/auth/LoginWithEmail";
 import SignUp from "./pages/auth/SignUp";
-import AndroidPosts from "./pages/admin/androidPosts/AndroidPosts";
-import ForgetPassword from "./pages/auth/ForgetPassword";
-import AuthCallback from "pages/auth/AuthCallback";
-import SetNewPassword from "pages/auth/SetNewPassword";
+// import AndroidPosts from "./pages/admin/androidPosts/AndroidPosts";
+// import ForgetPassword from "./pages/auth/ForgetPassword";
+// import AuthCallback from "pages/auth/AuthCallback";
+// import SetNewPassword from "pages/auth/SetNewPassword";
 
-// this function function for lazy route load...........
+// this function for lazy route load...........
 const ReactLazyPreload = (importStatement) => {
     const Component = lazy(importStatement)
     // Component.preload call when preload link clicked
@@ -45,14 +45,14 @@ function MyRoutes(props) {
         {path: "/", index: true, element: <HomePageLite/>},
         {path: "/search", index: true, element: <PostsFilterPageLite/>},
         {
-            path: "/author/profile/:username/:id",
+            path: "profile/:username",
             index: true,
             element: <ProfilePageSimple/>
         },
-        {path: "/posts/:slug/:id", index: true, element: <PostDetailSimple/>},
+        {path: "/posts/:slug", index: true, element: <PostDetailSimple/>},
         {path: "/about", index: true, element: <About/>},
 
-        {path: "/auth/auth-callback", index: false, element: <AuthCallback/>},
+        // {path: "/auth/auth-callback", index: false, element: <AuthCallback/>},
         {
             path: "/admin/dashboard",
             element: <Dashboard/>,
@@ -69,15 +69,23 @@ function MyRoutes(props) {
                     path: "add-post/:postId",
                     index: true,
                     element: <AddPost/>
-                }, {
-                    path: "android-posts",
-                    index: true,
-                    element: <AndroidPosts/>
                 },
+                // {
+                //     path: "android-posts",
+                //     index: true,
+                //     element: <AndroidPosts/>
+                // },
             ]
         },  // nested routes
         {
             path: "/auth/add-post/null",
+            element: <AddPost/>,
+            protected: true,
+            redirectUrl: "/auth/join",
+            authFetchInLoading: AddPostSkeleton
+
+        },{
+            path: "/profile/update-post/:postId",
             element: <AddPost/>,
             protected: true,
             redirectUrl: "/auth/join",
@@ -98,16 +106,16 @@ function MyRoutes(props) {
                     index: true,
                     element: <LoginWithEmail/>
                 },
-                {
-                    path: "reset-password",
-                    index: true,
-                    element: <ForgetPassword/>
-                },
-                {
-                    path: "new-password",
-                    index: true,
-                    element: <SetNewPassword/>
-                },
+                // {
+                //     path: "reset-password",
+                //     index: true,
+                //     element: <ForgetPassword/>
+                // },
+                // {
+                //     path: "new-password",
+                //     index: true,
+                //     element: <SetNewPassword/>
+                // },
 
             ]
         }, // nested routes

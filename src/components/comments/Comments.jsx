@@ -4,11 +4,9 @@ import fullLink from "../../utils/fullLink";
 import "./comments.scss"
 import AddComment from "./AddComment";
 
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
-import {faClock, faHeart, faPen, faReply, faTrash, faUserCircle} from "@fortawesome/free-solid-svg-icons";
-import PreLoad from "../UI/Preload/Preload";
-import {faHeart as faHeartLI} from "@fortawesome/pro-regular-svg-icons";
 
+import PreLoad from "../UI/Preload/Preload";
+import {BiHeart, BiPen, BiTrash, BiUser, CgClose, MdReplay} from "react-icons/all";
 
 const Comments = (props) => {
   const {
@@ -84,7 +82,7 @@ const Comments = (props) => {
           <div className="w-5 mr-2">
             {user && user.avatar ?
               <img className="flex w-full radius-100" src={fullLink(user.avatar)} alt="avatar"/>
-              :  <FontAwesomeIcon icon={faUserCircle} className="text-gray-500 text-md hover:text-primary" />
+              :  <BiUser className="text-gray-500 text-md hover:text-primary" />
                }
           </div>
 
@@ -97,25 +95,23 @@ const Comments = (props) => {
             <div className="comment-action flex mt-1 text-xs text-gray-dark-9  items-center">
               <li className="flex items-center">
            
-                <FontAwesomeIcon
+                <BiHeart
                   onClick={()=>toggleCommentReaction(_id)}
                   className={['text-xs cursor-pointer hover:text-pink-700 ',
                     youLiked ? 'text-pink-400 ' : 'text-gray-800'].join(" ")}
                   // icon={faHeart}
-                  icon={youLiked ? faHeart :  faHeartLI}
+                  // icon={youLiked ? faHeart :  faHeartLI}
                 />
                 <h4 className="text-xs font-medium ml-1">{likes && likes.length}</h4>
               </li>
               <li className="mx-3">
-                <FontAwesomeIcon
-                  icon={faReply}
+                <MdReplay
                   onClick={()=>onSetShowReplyCommentForm(_id)}
                   className="text-xs mr-1"
                 />
               </li>
               <li>
-                <FontAwesomeIcon
-                  icon={faClock}
+                <CgClose
                   onClick={()=>onSetShowReplyCommentForm(_id)}
                   className="text-xs mr-1"/>
                 {formatDateTime(new Date(createdAt))}
@@ -128,14 +124,14 @@ const Comments = (props) => {
                   <ul className="">
                     <li className={"px-2 py-1 flex-1 cursor-pointer hover:bg-primary_light  hover:text-primary flex"}>
                      <span className="pointer-events-none  whitespace-nowrap">
-                        <FontAwesomeIcon icon={faPen}  className="text-sm mr-1"/>
+                        <BiPen  className="text-sm mr-1"/>
                         <span>Edit comment</span>
                      </span>
                     </li>
                     <li onClick={()=>handleDeleteComment(_id)}
                         className={"px-2 py-1 cursor-pointer hover:bg-primary_light hover:text-primary flex"}>
                       <span className="pointer-events-none whitespace-nowrap">
-                        <FontAwesomeIcon icon={faTrash} className="text-sm mr-1"/>
+                        <BiTrash  className="text-sm mr-1"/>
                           <span>Delete comment</span>
                       </span>
                     </li>

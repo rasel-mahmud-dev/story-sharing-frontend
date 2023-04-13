@@ -3,9 +3,9 @@ import fullLink from "../../utils/fullLink";
 import {Link} from "react-router-dom";
 import api from "../../apis";
 
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faHeart, faUserCircle, faUsers} from "@fortawesome/free-solid-svg-icons";
+
 import PreloadLink from "src/components/preloadLink/PreloadLink";
+import {BiUser} from "react-icons/all";
 
 const Post = (props) => {
     const { post, authId } = props
@@ -37,7 +37,7 @@ const Post = (props) => {
                                     {post.author.avatar ? (
                                         <img className="w-5 rounded-full flex" src={fullLink(post.author.avatar)} alt=""/>
                                     ) : (
-                                        <FontAwesomeIcon icon={faUserCircle} />
+                                        <BiUser />
                                     ) }
                                 </div>
                                 <div className="flex justify-between flex-wrap items-center">

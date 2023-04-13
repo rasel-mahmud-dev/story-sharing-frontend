@@ -5,20 +5,10 @@ import React, {useEffect, useState} from "react";
 import {useDispatch} from "react-redux";
 
 
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {
-    faSearch,
-    faSignInAlt,
-    faSignOutAlt,
-    faUserAlt,
-    faUserCircle,
-    faSignIn, faMoon, faSun
-} from '@fortawesome/pro-solid-svg-icons'
-
-import {faAdn} from "@fortawesome/free-brands-svg-icons";
-
 import withWidth from "../UI/withWidth/WithWidth";
 import PreLoad from "../UI/Preload/Preload";
+import {BiMoon, BiSearch, BiSun, BiUser, FaSignInAlt, FaSignOutAlt} from "react-icons/all";
+import {searchPosts} from "actions/postAction";
 
 const Logo = (_) => <svg xmlns="http://www.w3.org/2000/svg" width="155" height="27.851" viewBox="0 0 153 27.851">
     <defs>
@@ -117,21 +107,21 @@ const Navigation = (props) => {
                         <>
                             {authState.role === "admin" && (
                                 <li className="flex hover:bg-primary hover:bg-opacity-40 hover:text-white cursor-pointer px-2 py-2">
-                                    <FontAwesomeIcon icon={faAdn} className="mr-2 dark_title text-gray-800"/>
+                                    {/*<FontAwesomeIcon icon={faAdn} className="mr-2 dark_title text-gray-800"/>*/}
                                     <PreLoad className="block dark_subtitle" onClick={() => handleSetExpandDropdown("")}
                                              to="/admin/dashboard">Dashboard</PreLoad>
                                 </li>
                             )}
                             <li className="flex hover:bg-opacity-40 hover:bg-primary hover:text-white cursor-pointer px-2 py-2">
                                 <PreLoad className="block dark_subtitle"
-                                         to={`/author/profile/${authState.username}/${authState._id}`}>
-                                    <FontAwesomeIcon icon={faUserAlt} className="mr-2 dark_title text-gray-800"/>
+                                         to={`/profile/${authState.username}`}>
+                                    {/*<FontAwesomeIcon icon={faUserAlt} className="mr-2 dark_title text-gray-800"/>*/}
                                     Profile
                                 </PreLoad>
                             </li>
                             <li onClick={() => logoutRoutePush("/user/profile")}
                                 className="flex hover:bg-primary hover:bg-opacity-40 hover:text-white cursor-pointer px-2 py-2">
-                                <FontAwesomeIcon icon={faSignOutAlt} className="mr-2 dark_title text-gray-800"/>
+                                {/*<FontAwesomeIcon icon={faSignOutAlt} className="mr-2 dark_title text-gray-800"/>*/}
                                 Logout
                             </li>
                         </>
@@ -140,8 +130,11 @@ const Navigation = (props) => {
                             className="flex flex-1 items-center hover:bg-primary hover:bg-opacity-40 hover:text-white  cursor-pointer  px-2 py-2"
                             // onClick={()=> pushRoute("/auth/login") }
                         >
-                            <PreLoad className="block" to="/auth/login"><FontAwesomeIcon className="mr-2 text-gray-800"
-                                                                                         icon={faSignIn}/>Login</PreLoad>
+                            <PreLoad className="block" to="/auth/login">
+                                <FaSignInAlt className="mr-2 text-gray-800"
+                                />
+
+                                Login</PreLoad>
                         </li>
                     )
                     }
@@ -152,8 +145,43 @@ const Navigation = (props) => {
 
     function searchHandler(e) {
         e.preventDefault()
+
+
         setOpenMobileSearch(false)
         let val = postState.searchValue.trim().toLowerCase()
+
+
+        searchPosts(val, function (result) {
+            try {
+
+                let items = result.split("----")
+                items=items.filter(item=>item)
+                items.forEach(item=>{
+                    let obj = JSON.parse(item)
+                    dispatch({
+                        type: "SEARCH_POSTS",
+                        payload: {
+                            search: val,
+                            data: obj
+                        }
+                    })
+                })
+
+                // let item = JSON.parse(result)
+                // console.log(item)
+                //
+                // dispatch({
+                //     type: "SEARCH_POSTS",
+                //     payload: {
+                //         search: val,
+                //         data: item
+                //     }
+                // })
+            } catch (ex) {
+                console.log(ex)
+            }
+        })
+
         if (val) {
             navigate(`/search?text=${val}`)
         } else {
@@ -163,12 +191,7 @@ const Navigation = (props) => {
     }
 
     function handleChange(e) {
-        if (e.target.value) {
-            dispatch({type: "SET_POST_SEARCH_VALUE", payload: e.target.value})
-        } else {
-            dispatch({type: "SEARCH_POSTS", payload: postState.posts})
-            dispatch({type: "SET_POST_SEARCH_VALUE", payload: ""})
-        }
+        dispatch({type: "SET_POST_SEARCH_VALUE", payload: e.target.value})
     }
 
     function openMenuHandler(e) {
@@ -235,15 +258,15 @@ const Navigation = (props) => {
                                 type="text"
                                 placeholder="Search posts"
                             />
-                            <FontAwesomeIcon icon={faSearch}
-                                             className="cursor-pointer text-gray-600 dark:text-gray-100 "
-                                             onClick={searchHandler}/>
+                            <BiSearch
+                                className="cursor-pointer text-gray-600 dark:text-gray-100 "
+                                onClick={searchHandler}/>
                         </div>
                         {/* show on Mobile */}
                         <div className="flex relative md:hidden">
-                            <FontAwesomeIcon icon={faSearch}
-                                             className="cursor-pointer pointer text-gray-500 text-md md:text-base "
-                                             onClick={() => setOpenMobileSearch(true)}/>
+                            <BiSearch
+                                className="cursor-pointer pointer text-gray-500 text-md md:text-base "
+                                onClick={() => setOpenMobileSearch(true)}/>
                         </div>
 
 
@@ -269,8 +292,8 @@ const Navigation = (props) => {
                                                 {authState.avatar
                                                     ? <img onError={loadErrorAvatar} className="w-5 rounded-full flex"
                                                            src={fullLink(authState.avatar)}/>
-                                                    : <FontAwesomeIcon icon={faUserCircle}
-                                                                       className="flex text-md text-gray-600 "/>
+                                                    : <BiUser
+                                                        className="flex text-md text-gray-600 "/>
                                                 }
                                             </div>
                                             {authDropdown(expandDropdown === "user_menu")}
@@ -298,21 +321,27 @@ const Navigation = (props) => {
                                                     onError={loadErrorAvatar}
                                                     onClick={openMenuHandler}
                                                 />
-                                                : <FontAwesomeIcon icon={faUserCircle}
-                                                                   className="flex text-md md:text-base text-gray-600"/>}
+                                                : <BiUser
+                                                    className="flex text-md md:text-base text-gray-600"/>}
                                             {authDropdown(expandDropdown === "user_menu")}
                                         </div>
                                     ) : (
                                         <Link to="/auth/join" className="flex">
-                                            <FontAwesomeIcon icon={faSignInAlt}
-                                                             className="text-md mx-4 md:text-base  text-gray-500"/>
+                                            <FaSignInAlt
+                                                className="text-md mx-4 md:text-base  text-gray-500"/>
                                         </Link>
                                     )}
 
                             </li>
                             <li className={"nav-item py-3"}>
-                                <FontAwesomeIcon onClick={toggleDarkTheme} icon={theme === "dark" ? faSun : faMoon}
-                                                 className={["flex text-md text-gray-600 md:text-base  cursor-pointer", theme === "dark" ? "text-white" : ""].join(" ")}/>
+                                {theme === "dark" ? <BiSun
+                                    className={["flex text-md text-gray-600 md:text-base  cursor-pointer", theme === "dark" ? "text-white" : ""].join(" ")}
+                                    onClick={toggleDarkTheme}/> : <BiMoon
+                                    className={["flex text-md text-gray-600 md:text-base  cursor-pointer", theme === "dark" ? "text-white" : ""].join(" ")}
+                                    onClick={toggleDarkTheme}/>}
+
+                                {/*<FontAwesomeIcon onClick={toggleDarkTheme} icon={theme === "dark" ? faSun : faMoon}*/}
+                                {/*                 className={["flex text-md text-gray-600 md:text-base  cursor-pointer", theme === "dark" ? "text-white" : ""].join(" ")}/>*/}
                             </li>
                         </ul>
 

@@ -130,7 +130,6 @@ const LoginWithEmail = (props) => {
 								navigate("/")
 							}
 						})
-					
 					} catch (ex){
 						setFetchLoading(false)
 						setMessage(ex.response ? ex.response.data.message : "Network fail")
@@ -144,8 +143,7 @@ const LoginWithEmail = (props) => {
 			},
 		}
 	]
-	
-	
+
 	function handleChange(e) {
 		if(!buttonState.continue){
 			setButtonState({...buttonState, continue: true})

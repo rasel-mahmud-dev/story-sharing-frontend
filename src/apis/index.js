@@ -16,7 +16,7 @@ export const baseBackend = import.meta.env.MODE === "development"
 
 const api = axios.create({
   baseURL: backend,
-  withCredentials: true, // to send cookie in server
+  // withCredentials: true, // to send cookie in server
   headers: {
     token: window.localStorage.getItem("token") || ""
   }
@@ -25,7 +25,7 @@ const api = axios.create({
 export function getApi(){
   return axios.create({
     baseURL: backend,
-    withCredentials: true, // to send cookie in server
+    // withCredentials: true, // to send cookie in server
     headers: {
       token: window.localStorage.getItem("token") || "",
       // 'Content-Type': 'application/json',

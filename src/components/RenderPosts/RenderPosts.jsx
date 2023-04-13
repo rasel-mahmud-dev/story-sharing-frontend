@@ -1,7 +1,7 @@
 import React from "react";
 import {Link} from "react-router-dom";
-import {FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import PreLoad from "../UI/Preload/Preload";
+import {BiUser} from "react-icons/all";
 
 
 function RenderPosts(props){
@@ -9,13 +9,13 @@ function RenderPosts(props){
 
 	return React.useMemo(() => {
 		return posts && posts.map((post, i)=>(
-			<PreLoad key={i} to={`/posts/${post.slug}/${post._id}`} className="post_link_a">
+			<PreLoad key={i} to={`/posts/${post.slug}`} className="post_link_a">
 				<div className="flex mt-8 justify-between flex-col sm:flex-row">
 					<div className="mr-4 flex-5 order-1">
 						<div className="flex align-center">
 							{post.avatar
 								? <img className="w-5 radius-100 mr-1" src={post.avatar} alt="avatar" />
-								: <FontAwesomeIcon icon={"user-circle"} className="w-5" />
+								: <BiUser icon={"user-circle"} className="w-5" />
 							}
 							<span className="ml-1 text-dark-500 dark:text-dark-100 font-medium">{post.username}</span>
 						</div>

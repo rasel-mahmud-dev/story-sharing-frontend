@@ -1,11 +1,10 @@
 import React from 'react';
 import fullLink from "../../utils/fullLink";
 
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faHeart, faPen, faTrash} from "@fortawesome/free-solid-svg-icons";
-import {deletePost} from "../../store/actions/postAction";
-import {getApi} from "../../apis";
+import {deletePost} from "actions/postAction";
+import {getApi} from "apis";
 import PreLoad from "../UI/Preload/Preload";
+import {BiPen, BiTrash} from "react-icons/all";
 
 const RenderAuthPosts = ({userPosts, _id, dispatch}) => {
 	
@@ -47,7 +46,7 @@ const RenderAuthPosts = ({userPosts, _id, dispatch}) => {
 							</div>
 							
 							<div className="flex w-full justify-between  flex-12">
-								<PreLoad to={`/posts/${post.slug}/${post._id}`}>
+								<PreLoad to={`/posts/${post.slug}`}>
 									<h4 className="hover:text-primary dark_subtitle">{post.title}</h4>
 								</PreLoad>
 								{_id && (
@@ -60,10 +59,10 @@ const RenderAuthPosts = ({userPosts, _id, dispatch}) => {
 												</div>
 												
 												<div className="flex">
-													<PreLoad to={`/admin/dashboard/add-post/${post._id}`}>
-														 <FontAwesomeIcon icon={faPen} className="pointer fa fa-trash ml-3 text-sm dark_gray "/>
+													<PreLoad to={`/profile/update-post/${post._id}`}>
+														 <BiPen className="pointer fa fa-trash ml-3 text-sm dark_gray "/>
 															</PreLoad>
-														 <FontAwesomeIcon icon={faTrash}
+														 <BiTrash
 															onClick={(e) => deletePostHandler(post._id, post.author_id, post.path)}
 															className="cursor-pointer  fa fa-trash ml-3 text-sm text-red-400 "/>
 													</div>

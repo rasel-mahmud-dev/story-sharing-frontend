@@ -1,7 +1,6 @@
 import React from "react";
-import {getApi} from "../../apis";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEye} from "@fortawesome/pro-light-svg-icons";
+import {getApi} from "apis";
+
 import AlertHandler from "../../components/AlertHandler/AlertHandler";
 
 function EditProfileFormModal(props) {
@@ -131,7 +130,7 @@ function EditProfileFormModal(props) {
 						type={ isShowPass ? "text" : type}
 						name={name}
 					/>
-					{ type === "password" && <FontAwesomeIcon onClick={toggleShowPassword} icon={faEye} className="cursor-pointer text-gray-500" /> }
+					{/*{ type === "password" && <FontAwesomeIcon onClick={toggleShowPassword} icon={faEye} className="cursor-pointer text-gray-500" /> }*/}
 				</div>
 			</div>
 		)
