@@ -26,7 +26,7 @@ const Dashboard = (props) => {
     { to: "/admin/dashboard/files", exact: true, text: "Markdown Files" },
     { to: "/admin/dashboard/logs", exact: true, text: "Server Logs" },
     { to: "/admin/dashboard/portfolio", exact: true, text: "Portfolio Posts" },
-    { to: "/admin/dashboard/android-posts", exact: true, text: "Android Posts" }
+    { to: "/admin/categories", exact: true, text: "Categories" }
   ]
   
   return (

@@ -1,7 +1,7 @@
 import {Link, NavLink, useNavigate} from "react-router-dom";
 import "./navigation.scss"
 import fullLink from "../../utils/fullLink";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useDispatch} from "react-redux";
 
 
@@ -9,6 +9,7 @@ import withWidth from "../UI/withWidth/WithWidth";
 import PreLoad from "../UI/Preload/Preload";
 import {BiMoon, BiSearch, BiSun, BiUser, FaSignInAlt, FaSignOutAlt} from "react-icons/all";
 import {searchPosts} from "actions/postAction";
+import apis from "apis";
 
 const Logo = (_) => <svg xmlns="http://www.w3.org/2000/svg" width="155" height="27.851" viewBox="0 0 153 27.851">
     <defs>
@@ -56,6 +57,8 @@ const Navigation = (props) => {
     const dispatch = useDispatch()
     const [theme, setTheme] = React.useState("light")
 
+    const headerRef = useRef()
+
     const [openMobileSearch, setOpenMobileSearch] = React.useState(false)
     const [isMobile, setIsMobile] = React.useState(false)
 
@@ -77,6 +80,19 @@ const Navigation = (props) => {
             setIsMobile(true)
         }
     }, [innerWidth])
+
+
+    useEffect(() => {
+
+        const height = headerRef.current.offsetHeight
+        document.documentElement.style
+            .setProperty('--header-height', height + "px") ;
+
+
+
+    }, []);
+
+
 
     function logoutRoutePush() {
         window.localStorage.setItem("token", "")
@@ -102,14 +118,14 @@ const Navigation = (props) => {
     function authDropdown(isShow) {
         return isShow && (
             <div className="dropdown_nav shadow-md">
-                <div className="min-w-200px dark:bg-dark-600 bg-white text-sm font-medium">
+                <div className="min-w-200 dark:bg-dark-600 bg-white text-sm font-medium p-4">
                     {authState._id ? (
                         <>
-                            {authState.role === "admin" && (
-                                <li className="flex hover:bg-primary hover:bg-opacity-40 hover:text-white cursor-pointer px-2 py-2">
+                            {authState.role === "MASTER" && (
+                                <li className="flex hover:bg-primary hover:bg-opacity-40 hover:text-white cursor-pointer px-2 py-4">
                                     {/*<FontAwesomeIcon icon={faAdn} className="mr-2 dark_title text-gray-800"/>*/}
                                     <PreLoad className="block dark_subtitle" onClick={() => handleSetExpandDropdown("")}
-                                             to="/admin/dashboard">Dashboard</PreLoad>
+                                             to="/admin">Dashboard</PreLoad>
                                 </li>
                             )}
                             <li className="flex hover:bg-opacity-40 hover:bg-primary hover:text-white cursor-pointer px-2 py-2">
@@ -119,6 +135,13 @@ const Navigation = (props) => {
                                     Profile
                                 </PreLoad>
                             </li>
+                            <PreLoad to="/user/reading-list">
+                                <li
+                                    className="flex hover:bg-primary hover:bg-opacity-40 hover:text-white cursor-pointer px-2 py-2">
+                                    {/*<FontAwesomeIcon icon={faSignOutAlt} className="mr-2 dark_title text-gray-800"/>*/}
+                                    My Reading List
+                                </li>
+                            </PreLoad>
                             <li onClick={() => logoutRoutePush("/user/profile")}
                                 className="flex hover:bg-primary hover:bg-opacity-40 hover:text-white cursor-pointer px-2 py-2">
                                 {/*<FontAwesomeIcon icon={faSignOutAlt} className="mr-2 dark_title text-gray-800"/>*/}
@@ -143,7 +166,7 @@ const Navigation = (props) => {
         )
     }
 
-    function searchHandler(e) {
+    async function searchHandler(e) {
         e.preventDefault()
 
 
@@ -151,36 +174,46 @@ const Navigation = (props) => {
         let val = postState.searchValue.trim().toLowerCase()
 
 
-        searchPosts(val, function (result) {
-            try {
+        let {data} = await apis.get("/api/posts/search?search="+val)
 
-                let items = result.split("----")
-                items=items.filter(item=>item)
-                items.forEach(item=>{
-                    let obj = JSON.parse(item)
-                    dispatch({
-                        type: "SEARCH_POSTS",
-                        payload: {
-                            search: val,
-                            data: obj
-                        }
-                    })
-                })
-
-                // let item = JSON.parse(result)
-                // console.log(item)
-                //
-                // dispatch({
-                //     type: "SEARCH_POSTS",
-                //     payload: {
-                //         search: val,
-                //         data: item
-                //     }
-                // })
-            } catch (ex) {
-                console.log(ex)
+        dispatch({
+            type: "SEARCH_POSTS",
+            payload: {
+                text: val,
+                data: data
             }
         })
+
+        // searchPosts(val, function (result) {
+        //     try {
+        //
+        //         let items = result.split("----")
+        //         items=items.filter(item=>item)
+        //         items.forEach(item=>{
+        //             let obj = JSON.parse(item)
+        //             dispatch({
+        //                 type: "SEARCH_POSTS",
+        //                 payload: {
+        //                     search: val,
+        //                     data: obj
+        //                 }
+        //             })
+        //         })
+        //
+        //         // let item = JSON.parse(result)
+        //         // console.log(item)
+        //         //
+        //         // dispatch({
+        //         //     type: "SEARCH_POSTS",
+        //         //     payload: {
+        //         //         search: val,
+        //         //         data: item
+        //         //     }
+        //         // })
+        //     } catch (ex) {
+        //         console.log(ex)
+        //     }
+        // })
 
         if (val) {
             navigate(`/search?text=${val}`)
@@ -231,8 +264,8 @@ const Navigation = (props) => {
     }
 
     return (
-        <div>
-            <div className="navigation bg-nav-light dark:bg-gray-900">
+        <header>
+            <div className="navigation bg-nav-light dark:bg-gray-900" ref={headerRef}>
 
                 <div style={{filter: isMobile && openMobileSearch ? "blur(5px)" : ""}}
                      className="navigation__container px-5 ">
@@ -241,8 +274,9 @@ const Navigation = (props) => {
                         <div className="nav-logo flex-4 md:flex-2   ">
                             <div className="flex align-center">
                                 <div className="brand">
-                                    <Link to="/" className="flex">
-                                        <img className="w-32 md:w-44 mr-2" src="/Vector (1).png" alt=""/>
+                                    <Link to="/" className="flex items-center">
+                                        <img className="w-12 mr-2" src="/icons.png" alt=""/>
+                                        <h4 className="!text-primary text-2xl font-bold">Devs</h4>
                                     </Link>
                                 </div>
                             </div>
@@ -366,8 +400,8 @@ const Navigation = (props) => {
                     </div>
                 )}
             </div>
-            <div className="h-60px"/>
-        </div>
+            <div className="header-height"/>
+        </header>
     );
 };
 

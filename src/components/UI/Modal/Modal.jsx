@@ -13,7 +13,8 @@ import {CSSTransition} from "react-transition-group"
 // }
 
 const Modal = (props)=>{
-  const { onClose, inProp,
+  const {
+      onClose, inProp,
     animationClassName,
     timeout,
     ...attributes 

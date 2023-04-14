@@ -1,0 +1,11 @@
+input, select{
+    width: 100%;
+    background: rgba(72, 72, 72, 0.09);
+    border: 1px solid #385294;
+    outline: none;
+    border-radius: 4px;
+    background: transparent;
+    padding: 4px 10px !important;
+
+    @apply text-dark-800
+}

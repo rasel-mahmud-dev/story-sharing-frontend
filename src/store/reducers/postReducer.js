@@ -1,3 +1,5 @@
+import ACTION_TYPES from "store/ACTION_TYPES";
+
 const initialState = {
     posts: [],
     postDetails: {},
@@ -8,6 +10,7 @@ const initialState = {
         text: "",
         data: []
     },
+    readingList: [],
     topPosts: {
         posts: [],
         last_time: "" // Date
@@ -15,7 +18,8 @@ const initialState = {
     // authPosts: null // after fetch posts it will be array of post then skeleton load complete
     cacheUserProfile: [
         // {_id: "", avatar: "", ...,  posts: []}
-    ]
+    ],
+    categories: []
 }
 
 
@@ -120,26 +124,69 @@ export default function (state = initialState, action) {
             return updatedState
 
 
-        case "SEARCH_POSTS" :
-
-            const {text, data}  = action.payload
-            let updatedSearchPosts  = [...state.search.data]
-
-            if(data){
-                let isExistIndex = updatedSearchPosts.findIndex( ex=> ex._id !== data._id)
-                if(isExistIndex === -1){
-                    updatedSearchPosts.push(data)
-                }
+        case ACTION_TYPES.FETCH_READING_LIST :
+            return {
+                ...state,
+                readingList: action.payload
             }
 
-            console.log(updatedSearchPosts)
 
+        case ACTION_TYPES.REMOVE_READING_LIST :
+            return {
+                ...state,
+                readingList: state.readingList.filter(r => r._id !== action.payload.postId)
+            }
+
+
+        case ACTION_TYPES.ADD_TO_READING_LIST :
+            return {
+                ...state,
+                readingList: [...state.readingList, action.payload]
+            }
+
+
+        case "SEARCH_POSTS" :
+            const {text, data} = action.payload
             return {
                 ...state,
                 search: {
                     text: text,
-                    data: updatedSearchPosts
+                    data: data
                 }
+            }
+
+        case ACTION_TYPES.FETCH_CATEGORIES :
+
+            return {
+                ...state,
+                categories: action.payload
+            }
+
+        case ACTION_TYPES.ADD_CATEGORY :
+            return {
+                ...state,
+                categories: [...state.categories, action.payload]
+            }
+
+        case ACTION_TYPES.REMOVE_CATEGORY :
+            return {
+                ...state,
+                categories: state.categories.filter(c => c._id !== action.payload)
+            }
+
+        case ACTION_TYPES.UPDATE_CATEGORY :
+            let updateCategories = [...state.categories]
+
+            index = updateCategories.findIndex(item => item._id === action.payload._id)
+            if (index !== -1) {
+                updateCategories[index] = {
+                    ...updateCategories[index],
+                    ...action.payload
+                }
+            }
+            return {
+                ...state,
+                categories: updateCategories
             }
 
         default:

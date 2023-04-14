@@ -1,4 +1,6 @@
 import api, {baseBackend, getApi} from "../../apis";
+import apis from "apis";
+import ACTION_TYPES from "store/ACTION_TYPES";
 
 
 export function filterPost(posts, searchValue) {
@@ -47,22 +49,33 @@ export function filterPostUsingTag(dispatch, tag, cb) {
         })
 }
 
-export function filterPostUsingText(dispatch, text, cb) {
-    api.post("/api/filter-posts", {
-        filter: {
+export async function searchPost(dispatch, text, cb) {
+
+    let {data} = await apis.get("/api/posts/search?search=" + val)
+
+    dispatch({
+        type: "SEARCH_POSTS",
+        payload: {
             text: text,
+            data: data
         }
-    }).then(doc => {
-        dispatch({
-            type: "SEARCH_POSTS",
-            payload: doc.data
-        })
-        cb && cb()
     })
-        .catch(ex => {
-            console.log(ex)
-            cb && cb()
-        })
+
+    // api.post("/api/filter-posts", {
+    //     filter: {
+    //         text: text,
+    //     }
+    // }).then(doc => {
+    //     dispatch({
+    //         type: "SEARCH_POSTS",
+    //         payload: doc.data
+    //     })
+    //     cb && cb()
+    // })
+    //     .catch(ex => {
+    //         console.log(ex)
+    //         cb && cb()
+    //     })
 }
 
 
@@ -84,6 +97,7 @@ export function fetchTopPosts(dispatch, pathname, cb) {
         }
     })
 }
+
 
 export function fetchPosts(dispatch, pathname, cb) {
     api.get("/api/posts").then(response => {
@@ -181,8 +195,7 @@ export const deletePost = (postId, path, author_id, adminId) => async (dispatch)
 }
 
 
-
-export function searchPosts(search, cb){
+export function searchPosts(search, cb) {
 
     let req = new XMLHttpRequest()
     req.open("GET", `${baseBackend}/api/posts/search?search=${search}`)
@@ -204,4 +217,67 @@ export function searchPosts(search, cb){
 
     req.setRequestHeader('Content-type', 'text/html')
     req.send()
+}
+
+
+export function fetchMyReadingList() {
+
+    return async function (dispatch) {
+
+        try {
+            let response = await getApi().get("/api/posts/reading-list")
+            if (response.status === 200) {
+                let arr = []
+
+                if (response.data) {
+                    arr = response.data.map(item => {
+                        return {
+                            ...item.post,
+                            readingId: item._id,
+                            addedOn: item.createdAt,
+                        }
+                    })
+
+
+                }
+
+                dispatch({
+                    type: ACTION_TYPES.FETCH_READING_LIST,
+                    payload: arr
+                })
+            }
+
+        } catch (ex) {
+
+        }
+
+    }
+}
+
+export function addToReadingList(postId) {
+
+    return async function (dispatch) {
+        let {data, status} = await api.post(`/api/posts/reading-list/` + postId)
+        if (status === 201) {
+            dispatch({
+                type: ACTION_TYPES.ADD_TO_READING_LIST,
+                payload: data.post
+            })
+        }
+    }
+}
+
+export function removeReadingList(postId) {
+
+    return async function (dispatch) {
+        let response = await api.delete(`/api/posts/reading-list/` + postId)
+        if (response.status === 201) {
+            dispatch({
+                type: ACTION_TYPES.REMOVE_READING_LIST,
+                payload: {
+                    postId: postId
+                }
+            })
+        }
+    }
 }

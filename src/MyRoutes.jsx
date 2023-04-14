@@ -6,6 +6,8 @@ import AddPostSkeleton from "./pages/admin/AddPostSkeleton";
 import AllSignIn from "./pages/auth/AllSignIn";
 import LoginWithEmail from "./pages/auth/LoginWithEmail";
 import SignUp from "./pages/auth/SignUp";
+import ReadingList from "pages/profilePage/ReadingList/ReadingList";
+import Categories from "pages/admin/categories/Categories";
 // import AndroidPosts from "./pages/admin/androidPosts/AndroidPosts";
 // import ForgetPassword from "./pages/auth/ForgetPassword";
 // import AuthCallback from "pages/auth/AuthCallback";
@@ -52,24 +54,31 @@ function MyRoutes(props) {
         {path: "/posts/:slug", index: true, element: <PostDetailSimple/>},
         {path: "/about", index: true, element: <About/>},
 
+        {path: "/user/reading-list", index: true, element: <ReadingList/>},
+
         // {path: "/auth/auth-callback", index: false, element: <AuthCallback/>},
         {
-            path: "/admin/dashboard",
+            path: "/admin",
             element: <Dashboard/>,
             protected: true,
             redirectUrl: "/auth/join",
             authFetchInLoading: AddPostSkeleton,
             children: [
                 {
-                    path: "",
+                    path: "categories",
                     index: true,
-                    element: <AllSignIn/>
+                    element: <Categories/>
                 },
-                {
-                    path: "add-post/:postId",
-                    index: true,
-                    element: <AddPost/>
-                },
+                // {
+                //     path: "",
+                //     index: true,
+                //     element: <AllSignIn/>
+                // },
+                // {
+                //     path: "add-post/:postId",
+                //     index: true,
+                //     element: <AddPost/>
+                // },
                 // {
                 //     path: "android-posts",
                 //     index: true,
@@ -84,7 +93,8 @@ function MyRoutes(props) {
             redirectUrl: "/auth/join",
             authFetchInLoading: AddPostSkeleton
 
-        },{
+        },
+        {
             path: "/profile/update-post/:postId",
             element: <AddPost/>,
             protected: true,

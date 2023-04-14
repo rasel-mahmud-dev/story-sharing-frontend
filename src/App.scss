@@ -11,6 +11,10 @@ html{
 }
 
 
+:root{
+  --header-height: 93px
+}
+
 
 
 body{
@@ -164,12 +168,22 @@ a{
 .flex-10{flex: 10}
 .text-center{text-align: center}
 .title{
-  color: var(--gray-10);
+  //color: var(--gray-10);
   font-weight: 500;
   margin: 0;
   padding: 0;
+
+  @apply text-dark-800 dark:text-gray-50
+
 }
-.subtitle{color: #707070}
+.subtitle{
+  @apply text-dark-800 dark:text-gray-200 font-medium
+}
+
+.para{
+  @apply text-dark-800 dark:text-gray-300 font-normal
+}
+
 .text-white{color: var(--white);}
 
 .viewport{
@@ -345,3 +359,46 @@ a{
   }
 }
 .color-inherit{    color: inherit !important;}
+
+
+
+// Quil edit custom font
+
+.ql-font-impact {
+  font-family: 'Impact', serif;
+}
+
+.ql-font-courier {
+  font-family: 'Courier', serif;
+}
+
+.ql-font-comic {
+  font-family: 'Comic Sans MS', serif;
+}
+
+.ql-font-Poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+.ql-font-Roboto {
+  font-family: 'Roboto', sans-serif;
+}
+
+.ql-font-Lato {
+  font-family: 'Lato', sans-serif;
+}
+
+.ql-font-Rubik {
+  font-family: 'Rubik', sans-serif;
+}
+
+.ql-font-Open-Sans {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.ql-font-FiraCode {
+  font-family: 'Fira Code', monospace;
+}
+.ql-font-Merriweather {
+  font-family: 'Merriweather', serif;
+}

@@ -1,4 +1,4 @@
-import React, {memo, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import {useParams, useNavigate, useLocation} from "react-router-dom";
 
 import "./addPost.scss"
@@ -33,12 +33,15 @@ import ReactQuill, {Quill} from "react-quill";
 
 import 'react-quill/dist/quill.snow.css';
 import RichTextEditor from "components/RichTextEditor/RichTextEditor";
+import {fetchCategories} from "actions/categoryAction";
 
 
 const AddPost = (props) => {
 
     const dispatch = useDispatch()
     const authState = useSelector(state => state.authState)
+
+    const {categories} = useSelector(state => state.postState)
 
     const [image, setImage] = React.useState("")
     const [loadingState, setLoadingState] = React.useState({
@@ -56,52 +59,27 @@ const AddPost = (props) => {
     const {postId} = useParams()
 
 
-
     let [post, setPost] = React.useState({
         title: "",
         tags: [],
         cover: "",
         summary: "",
         isUpdated: false,
-        mdContent: "",
+        categoryId: "",
+        isPrivate: false,
         htmlContent: ""
     })
 
 
     const params = useParams()
-    const location = useLocation()
 
 
-    let m = new MarkdownIt({
-        html: true,
-        linkify: true,
-        typographer: true,
-        highlight: function (str, lang) {
-            if (lang && hljs.getLanguage(lang)) {
-                try {
-                    return hljs.highlight(lang, str).value
-                } catch (__) {
-                }
-            }
-            return "" // use external default escaping
-        }
-    })
+    function fetchUpdatedPost(postId, cb) {
 
-
-    function fetchUpdatedPost(postId, isAndroid, cb) {
-
-        let path = isAndroid ? `/api/android/posts/${postId}` : `/api/posts/${postId}`
-        api.get(path).then(response => {
-            if (response.status === 200) {
-                dispatch({
-                    type: "FETCH_POST",
-                    payload: response.data.post
-                })
-                cb(response.data.post)
-            }
+        let path = `/api/posts/get-update-post/${postId}`
+        getApi().get(path).then(response => {
+            cb(response.data)
         })
-
-
     }
 
     React.useEffect(() => {
@@ -109,13 +87,7 @@ const AddPost = (props) => {
         let isAndroid = false
         if (params.postId && params.postId !== "null") {
 
-            let h = queryString.parse(location.search)
-            if (h && h.w && h.w === "app") {
-                isAndroid = true
-            }
-
-
-            fetchUpdatedPost(params.postId, isAndroid, (returnPost) => {
+            fetchUpdatedPost(params.postId, (returnPost) => {
 
                 setPost({
                     ...post,
@@ -124,38 +96,47 @@ const AddPost = (props) => {
                 })
 
 
-                let req = new XMLHttpRequest()
-                req.open("GET", `${baseBackend}/api/raw-post-content?slug=${returnPost.slug}`)
-                req.responseType = 'text';
-                req.onload = function (e) {
-                }
-                req.onprogress = ev => {
-                }
-                /** store chunked markdown html and render it  */
-                req.onreadystatechange = function () {
-                    if (req.response) {
-                        setMarkdown_string((v) => v + req.response)
-                    }
-                }
-                req.setRequestHeader('Content-type', 'application/json')
-                req.send(JSON.stringify({
-                    filePath: returnPost.path,
-                    post_id: params.postId
-                }));
+                // let req = new XMLHttpRequest()
+                // req.open("GET", `${baseBackend}/api/raw-post-content?slug=${returnPost.slug}`)
+                // req.responseType = 'text';
+                // req.onload = function (e) {
+                // }
+                // req.onprogress = ev => {
+                // }
+                // /** store chunked markdown html and render it  */
+                // req.onreadystatechange = function () {
+                //     if (req.response) {
+                //         setMarkdown_string((v) => v + req.response)
+                //     }
+                // }
+                // req.setRequestHeader('Content-type', 'application/json')
+                // req.send(JSON.stringify({
+                //     filePath: returnPost.path,
+                //     post_id: params.postId
+                // }));
 
             })
         }
     }, [params.postId])
 
 
+    useEffect(() => {
+        dispatch(fetchCategories())
+    }, []);
+
+
     function handleChange(e) {
-        const {name, value, values} = e.target
+        const {name, type, value, checked, values} = e.target
+
         let updatedPost = {...post}
         if (name === "tags") {
             updatedPost.tags = values
+        } else if (type === "checkbox") {
+            updatedPost[name] = checked
         } else {
             updatedPost[name] = value
         }
+
         setPost(updatedPost)
     }
 
@@ -175,121 +156,106 @@ const AddPost = (props) => {
 
         let updateURL = ""
         let createURL = ""
-        if (typeof e !== "string") {
-            updateURL = "/api/posts/update-post"
-            createURL = "/api/posts/add-post"
-            e.preventDefault()
-        } else {
-            updateURL = "/api/android/posts/update-post"
-            createURL = "/api/android/posts/add-post"
-        }
+
+        updateURL = "/api/posts/update-post"
+        createURL = "/api/posts/add-post"
+        e.preventDefault()
+
 
         const {isUpdated, _id, title, tags, cover_url, htmlContent} = post
 
-        if (title && title.trim() && htmlContent) {
+        if (params.postId) {
+            getApi().post(updateURL, {
+                _id,
+                title,
+                tags,
+                summary: post.summary,
+                categoryId: post.categoryId,
+                isPrivate: post.isPrivate,
+                cover: post.cover ? post.cover : "",
+                htmlContent: post.htmlContent
+            }).then(response => {
+                if (response.status < 400 && response.status >= 200) {
 
-            if (params.postId) {
+                    let path = `/posts/${response.data.post.slug}`
+                    // dispatch({
+                    //   type: "UPDATE_USER_PROFILE_POSTS",
+                    //   payload: { userId: authState._id, post: response.data }
+                    // })
+                    // navigate(path)
 
-
-                getApi().post(updateURL, {
-                    _id,
-                    title,
-                    tags,
-                    summary: post.summary,
-                    cover: post.cover ? post.cover : "",
-                    htmlContent: post.htmlContent
-                }).then(response => {
-                    if (response.status < 400 && response.status >= 200) {
-
-                        let path = `/posts/${response.data.post.slug}`
-                        // dispatch({
-                        //   type: "UPDATE_USER_PROFILE_POSTS",
-                        //   payload: { userId: authState._id, post: response.data }
-                        // })
-                        // navigate(path)
-
-                        // setLoadingState({
-                        //     id: "addpost",
-                        //     message: "Post Updated",
-                        //     status: 200,
-                        //     isLoading: false,
-                        // })
-                        // setTimeout(() => {
-                        //     let path = `/author/profile/${authState.username}/${authState._id}`
-                        //     navigate(path)
-                        // }, 500)
-                    } else {
-                        setLoadingState({
-                            id: "addpost",
-                            message: "Post Update Fail",
-                            status: 400,
-                            isLoading: false,
-                        })
-                    }
-                }).catch(ex => {
+                    // setLoadingState({
+                    //     id: "addpost",
+                    //     message: "Post Updated",
+                    //     status: 200,
+                    //     isLoading: false,
+                    // })
+                    // setTimeout(() => {
+                    //     let path = `/author/profile/${authState.username}/${authState._id}`
+                    //     navigate(path)
+                    // }, 500)
+                } else {
                     setLoadingState({
                         id: "addpost",
                         message: "Post Update Fail",
                         status: 400,
                         isLoading: false,
                     })
-                })
-            } else {
-
-                let d = {
-                    title: title.trim(),
-                    tags,
-                    summary: post.summary,
-                    htmlContent: post.htmlContent,
-                    cover: post.cover ? post.cover : ""
                 }
-                getApi().post(createURL, d)
-                    .then(response => {
-                        if (response.status < 400 && response.status >= 200) {
-                            setLoadingState({
-                                id: "addpost",
-                                message: "Post Upload Successful",
-                                status: 200,
-                                isLoading: false,
-                            })
-                            setTimeout(() => {
-                                // let path = `/author/profile/${authState.username}/${authState._id}`
-                                let path = `/posts/${response.data.post.slug}`
-                                // dispatch({
-                                //   type: "UPDATE_USER_PROFILE_POSTS",
-                                //   payload: { userId: authState._id, post: response.data }
-                                // })
-                                navigate(path)
-                            }, 500)
-                        } else {
-                            setLoadingState({
-                                id: "addpost",
-                                message: "Post Upload Fail",
-                                status: 400,
-                                isLoading: false,
-                            })
-                        }
-                    }).catch(ex => {
-                    console.log(ex)
-                    setLoadingState({
-                        id: "addpost",
-                        message: ex.message,
-                        status: 400,
-                        isLoading: false,
-                    })
+            }).catch(ex => {
+                setLoadingState({
+                    id: "addpost",
+                    message: "Post Update Fail",
+                    status: 400,
+                    isLoading: false,
                 })
-            }
-
-
+            })
         } else {
-            setLoadingState({
-                id: "addpost",
-                message: "Please fill up all input fields",
-                status: 400,
-                isLoading: false,
+
+            let d = {
+                title: title.trim(),
+                tags,
+                categoryId: post.categoryId,
+                isPrivate: post.isPrivate,
+                summary: post.summary,
+                htmlContent: post.htmlContent,
+                cover: post.cover ? post.cover : ""
+            }
+            getApi().post(createURL, d)
+                .then(response => {
+                    if (response.status < 400 && response.status >= 200) {
+                        setLoadingState({
+                            id: "addpost",
+                            message: "Post Upload Successful",
+                            status: 200,
+                            isLoading: false,
+                        })
+                        setTimeout(() => {
+                            // let path = `/author/profile/${authState.username}/${authState._id}`
+                            let path = `/posts/${response.data.post.slug}`
+                            // dispatch({
+                            //   type: "UPDATE_USER_PROFILE_POSTS",
+                            //   payload: { userId: authState._id, post: response.data }
+                            // })
+                            navigate(path)
+                        }, 500)
+                    } else {
+                        setLoadingState({
+                            id: "addpost",
+                            message: "Post Upload Fail",
+                            status: 400,
+                            isLoading: false,
+                        })
+                    }
+                }).catch(ex => {
+                setLoadingState({
+                    id: "addpost",
+                    message: ex.message,
+                    status: 400,
+                    isLoading: false,
+                })
             })
         }
-
     }
 
     // Initialize a markdown parser
@@ -416,6 +382,25 @@ const AddPost = (props) => {
                         </div>
 
                         <div className="form-group flex-col">
+                            <label className="block no-wrap text-sm dark_subtitle" htmlFor="Category">Category</label>
+                            <select onChange={handleChange} name="categoryId" id="Category">
+                                <option value="">Select a category</option>
+                                {categories.map(cat => (
+                                    <option value={cat._id}>{cat.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="form-group flex-col">
+                            <div className="flex w-max gap-x-1">
+                                <input onChange={handleChange} type="checkbox" name="isPrivate" id="isPrivate"
+                                       checked={post.isPrivate}/>
+                                <label className="block no-wrap text-sm dark_subtitle"
+                                       htmlFor="isPrivate">Private</label>
+                            </div>
+                        </div>
+
+                        <div className="form-group flex-col">
                             <label className="block no-wrap text-sm dark_subtitle" htmlFor="">Article</label>
 
                             {/*<MdEditor*/}
@@ -427,10 +412,6 @@ const AddPost = (props) => {
                             {/*/>*/}
                             {/*<textarea style={{ minHeight: post.isUpdated ? "500px": "200px" }} className="input-elem ml-5" defaultValue={post.mdContent}></textarea>*/}
 
-
-                        </div>
-
-                        <div className="rich-texteditor">
                             <RichTextEditor
                                 value={post.htmlContent}
                                 onChange={(e) => setPost(p => ({...p, htmlContent: e}))}

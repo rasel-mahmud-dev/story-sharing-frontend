@@ -3,7 +3,7 @@ import {Link, useParams} from "react-router-dom";
 import "./style.scss"
 import apis, {baseBackend, getApi} from "../../apis";
 import fullLink from "../../utils/fullLink";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 
 import PostDetailSkeleton from "./PostDetailSkeleton";
 import AddComment from "../../components/comments/AddComment";
@@ -16,13 +16,15 @@ import parser from "html-react-parser"
 import "./hijs.scss"
 import Spin from "../../components/UI/Spin/Spin";
 import PreLoad from "../../components/UI/Preload/Preload";
-import {BiComment, BiHeart, BiUser, BsEye, CgLock} from "react-icons/all";
+import {BiComment, BiHeart, BiPen, BiUser, BsClock, BsEye, CgLock} from "react-icons/all";
+import {addToReadingList, removeReadingList} from "actions/postAction";
 
 let id;
 const PostDetails = (props) => {
 
     let params = useParams()
     const authState = useSelector(state => state.authState)
+    const {readingList} = useSelector(state => state.postState)
 
     const [httpProgress, setHttpProgress] = React.useState(false)
 
@@ -67,6 +69,13 @@ const PostDetails = (props) => {
     }, [loadingState.isShown])
 
     const [isOver, setOver] = React.useState(false)
+
+
+    const dispatch = useDispatch()
+
+    function handleAddReadingList(postId) {
+        dispatch(addToReadingList(postId))
+    }
 
 
     useEffect(async () => {
@@ -482,8 +491,8 @@ const PostDetails = (props) => {
                                 <h4 className="title">
                                     <PreLoad
                                         className="text-md"
-                                        to={`/author/profile/${postDetails.author.first_name} ${postDetails.author.last_name ? postDetails.author.last_name : ""}/${postDetails.author._id}`}>
-                                        {postDetails.author.first_name} {postDetails.author.last_name}
+                                        to={`/author/profile/${postDetails.author.firstName} ${postDetails.author.lastName ? postDetails.author.lastName : ""}/${postDetails.author._id}`}>
+                                        {postDetails.author.firstName} {postDetails.author.lastName}
                                     </PreLoad>
                                 </h4>
                                 <button className="btn ml-5 btn-outline dark_subtitle">Follow</button>
@@ -495,15 +504,32 @@ const PostDetails = (props) => {
 
 
                     {/* post title */}
-                    <div className="post_meta mt-4">
-                        <h1 className="title text-3xl dark_title">{postDetails.title}</h1>
-                        <div className="mt-2 mb-4 subtitle text-sm">
-                            <CgLock className="mr-1"/>
+                    <div className="post_meta mt-4 mb-6">
+                        <div className="flex justify-between items-center">
+                            <h1 className="title text-3xl dark_title">{postDetails.title}</h1>
+                            <Link to={`/profile/update-post/${postDetails._id}`}>
+                                <button className="btn ml-5 btn-outline dark_subtitle flex items-center gap-x-1 px-4 ">
+                                    <BiPen/> <span>Edit</span></button>
+                            </Link>
+                        </div>
+                        <div className="mt-2 mb-4 subtitle text-sm flex items-center gap-x-1">
+                            <BsClock className=""/>
                             <span className="dark_gray">Create at {" "}
                                 {new Date(postDetails.createdAt).toDateString()}
                                 {" "} {new Date(postDetails.createdAt).toLocaleTimeString()}
-                </span>
+                            </span>
                         </div>
+
+                        {readingList.findIndex(list => list._id === postDetails._id) === -1 ? (
+                            <button onClick={() => handleAddReadingList(postDetails._id)}
+                                    className="btn btn-outline hover:bg-primary hover:text-white dark_subtitle">Add To
+                                Reading List</button>
+                        ) : (
+                            <button onClick={() => dispatch(removeReadingList(postDetails._id))}
+                                    className="btn btn-outline hover:bg-primary hover:text-white dark_subtitle">Remove
+                                from Reading List</button>
+                        )}
+
                     </div>
 
                     {/* post cover photo */}

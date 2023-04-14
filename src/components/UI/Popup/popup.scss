@@ -1,0 +1,41 @@
+/********* Popup ************/
+.popup {
+    transition: all .4s ease;
+    z-index: 2000;
+
+   @apply bg-white dark:bg-dark-800;
+
+
+    &--close {
+        transform: translateY(30px);
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    &--open {
+        transform: translateY(0px);
+        visibility: visible;
+        opacity: 1;
+
+    }
+    &.auth-menu-popup{
+        min-width: 200px;
+    }
+}
+
+.center-scale-popup {
+    opacity: 1 !important;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    top: 30vh;
+    @apply shadow-2xl;
+    &.popup--close {
+        transform: translateX(-50%) scale(0);
+
+    }
+
+    &.popup--open {
+        transform: translateX(-50%) scale(1);
+    }
+}
